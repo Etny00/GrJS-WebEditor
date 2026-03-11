@@ -2934,15 +2934,72 @@
     // ─── Custom Sections & Media Blocks ───────────────────────────────────
     (function (editor) {
       var bm = editor.BlockManager;
+      var domt = editor.DomComponents;
+
+      // ── Helper: find descendant by class ────────────────────────────────
+      function findByClass(cm, className) {
+        var found = null;
+        function walk(m) {
+          if (found) return;
+          var cl = (m.getAttributes ? m.getAttributes().class : '') || '';
+          if (cl.split(' ').indexOf(className) !== -1) { found = m; return; }
+          m.components && m.components().each(walk);
+        }
+        walk(cm);
+        return found;
+      }
+
+      domt.addType('cs-hero-section', {
+        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-hero-bg') ? { type: 'cs-hero-section' } : undefined; },
+        model: {
+          defaults: {
+            tagName: 'section',
+            traits: [
+              {
+                type: 'select',
+                name: 'data-hero-bg',
+                label: 'Background',
+                options: [
+                  { id: 'gradient', name: 'Purple Gradient' },
+                  { id: 'dark',     name: 'Dark' },
+                  { id: 'light',    name: 'Light' },
+                  { id: 'white',    name: 'White' },
+                ],
+                changeProp: 0,
+              },
+              {
+                type: 'checkbox',
+                name: 'data-hero-fullheight',
+                label: 'Full Height (100vh)',
+                valueTrue: '1',
+                valueFalse: '0',
+                changeProp: 0,
+              },
+              {
+                type: 'select',
+                name: 'data-hero-align',
+                label: 'Text Align',
+                options: [
+                  { id: 'center', name: 'Center' },
+                  { id: 'left',   name: 'Left' },
+                  { id: 'right',  name: 'Right' },
+                ],
+                changeProp: 0,
+              },
+            ]
+          }
+        }
+      });
 
       bm.add('hero-section', {
         label: 'Hero Section',
         category: 'Sections',
         attributes: { class: 'fa fa-home' },
         content: {
-          type: 'default',
+          type: 'cs-hero-section',
           tagName: 'section',
           attributes: {
+            'data-gjs-type': 'cs-hero-section',
             'data-hero-fullheight': '0',
             'data-hero-bg': 'gradient',
             style: 'background:linear-gradient(135deg,#4d114f,#a0449e);padding:100px 20px;text-align:center;color:#fff;font-family:Helvetica,sans-serif;min-height:auto;box-sizing:border-box;'
@@ -2957,39 +3014,6 @@
                 { tagName: 'a',  attributes: { href: '#', style: 'display:inline-block;padding:14px 36px;background:#fff;color:#4d114f;border-radius:4px;font-weight:700;text-decoration:none;' }, components: [{ type: 'text', content: 'Get Started' }] }
               ]
             }
-          ],
-          traits: [
-            {
-              type: 'select',
-              name: 'data-hero-bg',
-              label: 'Background',
-              options: [
-                { id: 'gradient', name: 'Purple Gradient' },
-                { id: 'dark',     name: 'Dark' },
-                { id: 'light',    name: 'Light' },
-                { id: 'white',    name: 'White' },
-              ],
-              changeProp: 0,
-            },
-            {
-              type: 'checkbox',
-              name: 'data-hero-fullheight',
-              label: 'Full Height (100vh)',
-              valueTrue: '1',
-              valueFalse: '0',
-              changeProp: 0,
-            },
-            {
-              type: 'select',
-              name: 'data-hero-align',
-              label: 'Text Align',
-              options: [
-                { id: 'center', name: 'Center' },
-                { id: 'left',   name: 'Left' },
-                { id: 'right',  name: 'Right' },
-              ],
-              changeProp: 0,
-            },
           ],
         },
       });
@@ -3010,12 +3034,16 @@
 
       // ── Register custom component types so traits show in Settings panel ──
       // isComponent() maps DOM elements back to their type when the editor loads.
-      var domt = editor.DomComponents;
 
       domt.addType('cs-video-hero', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-vh-url') ? { type: 'cs-video-hero' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-vh-url')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-video-hero') ? { type: 'cs-video-hero' } : undefined; },
         model: { defaults: { tagName: 'div', traits: [
+          { type: 'select', name: 'data-vh-type', label: 'Video Type', changeProp: 0,
+            options: [{ id:'mp4', name:'MP4 File' }, { id:'youtube', name:'YouTube' }, { id:'vimeo', name:'Vimeo' }] },
           { type: 'text',   name: 'data-vh-url',     label: 'Video URL (.mp4)', changeProp: 0 },
+          { type: 'text',   name: 'data-vh-id',      label: 'YouTube/Vimeo ID', changeProp: 0 },
+          { type: 'checkbox', name: 'data-vh-autoplay', label: 'Autoplay', changeProp: 0, valueTrue: '1', valueFalse: '0' },
+          { type: 'checkbox', name: 'data-vh-loop',     label: 'Loop',     changeProp: 0, valueTrue: '1', valueFalse: '0' },
           { type: 'select', name: 'data-vh-height',  label: 'Height', changeProp: 0,
             options: [{ id:'400px', name:'400px' }, { id:'500px', name:'500px' }, { id:'600px', name:'600px' }, { id:'100vh', name:'Full Screen (100vh)' }] },
           { type: 'select', name: 'data-vh-overlay', label: 'Overlay Opacity', changeProp: 0,
@@ -3027,7 +3055,7 @@
       });
 
       domt.addType('cs-image-gallery', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-gal-cols') ? { type: 'cs-image-gallery' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-gal-cols')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-image-gallery') ? { type: 'cs-image-gallery' } : undefined; },
         model: { defaults: { tagName: 'section', traits: [
           { type: 'select', name: 'data-gal-cols',   label: 'Columns', changeProp: 0,
             options: [{ id:'2', name:'2 Columns' }, { id:'3', name:'3 Columns' }, { id:'4', name:'4 Columns' }] },
@@ -3040,7 +3068,7 @@
       });
 
       domt.addType('cs-image-masonry', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-mas-bg') ? { type: 'cs-image-masonry' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-mas-bg')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-image-masonry') ? { type: 'cs-image-masonry' } : undefined; },
         model: { defaults: { tagName: 'section', traits: [
           { type: 'color',  name: 'data-mas-bg',     label: 'Background', changeProp: 0 },
           { type: 'select', name: 'data-mas-gap',    label: 'Gap', changeProp: 0,
@@ -3051,7 +3079,7 @@
       });
 
       domt.addType('cs-before-after', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-ba-accent') ? { type: 'cs-before-after' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-ba-accent')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-before-after') ? { type: 'cs-before-after' } : undefined; },
         model: { defaults: { tagName: 'section', traits: [
           { type: 'text',  name: 'data-ba-label-before', label: 'Label Links (Before)', changeProp: 0 },
           { type: 'text',  name: 'data-ba-label-after',  label: 'Label Rechts (After)', changeProp: 0 },
@@ -3061,7 +3089,7 @@
       });
 
       domt.addType('cs-portfolio', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-pf-cols') ? { type: 'cs-portfolio' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-pf-cols')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-portfolio') ? { type: 'cs-portfolio' } : undefined; },
         model: { defaults: { tagName: 'section', traits: [
           { type: 'select', name: 'data-pf-cols',   label: 'Columns', changeProp: 0,
             options: [{ id:'2', name:'2 Columns' }, { id:'3', name:'3 Columns' }, { id:'4', name:'4 Columns' }] },
@@ -3073,7 +3101,7 @@
       });
 
       domt.addType('cs-lightbox', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-lb-cols') ? { type: 'cs-lightbox' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-lb-cols')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-lightbox') ? { type: 'cs-lightbox' } : undefined; },
         model: { defaults: { tagName: 'section', traits: [
           { type: 'select', name: 'data-lb-cols',   label: 'Columns', changeProp: 0,
             options: [{ id:'2', name:'2 Columns' }, { id:'3', name:'3 Columns' }, { id:'4', name:'4 Columns' }] },
@@ -3086,7 +3114,7 @@
       });
 
       domt.addType('cs-audio-player', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-aud-title') ? { type: 'cs-audio-player' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-aud-title')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-audio-player') ? { type: 'cs-audio-player' } : undefined; },
         model: { defaults: { tagName: 'div', traits: [
           { type: 'text',  name: 'data-aud-title',  label: 'Track Title', changeProp: 0 },
           { type: 'text',  name: 'data-aud-artist', label: 'Artist Name', changeProp: 0 },
@@ -3096,7 +3124,7 @@
       });
 
       domt.addType('cs-video-embed', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-vid-url') ? { type: 'cs-video-embed' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-vid-url')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-video-embed') ? { type: 'cs-video-embed' } : undefined; },
         model: { defaults: { tagName: 'div', traits: [
           { type: 'text',     name: 'data-vid-url',      label: 'Embed URL', changeProp: 0 },
           { type: 'checkbox', name: 'data-vid-autoplay', label: 'Autoplay', changeProp: 0, valueTrue: '1', valueFalse: '0' },
@@ -3105,7 +3133,7 @@
       });
 
       domt.addType('cs-faq', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-faq-accent') ? { type: 'cs-faq' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-faq-accent')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-faq') ? { type: 'cs-faq' } : undefined; },
         model: { defaults: { tagName: 'div', traits: [
           { type: 'color', name: 'data-faq-accent', label: 'Accent Color', changeProp: 0 },
           { type: 'color', name: 'data-faq-bg',     label: 'Background Color', changeProp: 0 },
@@ -3113,7 +3141,7 @@
       });
 
       domt.addType('cs-pricing', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-pricing-currency') ? { type: 'cs-pricing' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-pricing-currency')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-pricing') ? { type: 'cs-pricing' } : undefined; },
         model: { defaults: { tagName: 'div', traits: [
           { type: 'select', name: 'data-pricing-currency', label: 'Currency', changeProp: 0,
             options: [{ id:'$', name:'$ Dollar' }, { id:'€', name:'€ Euro' }, { id:'£', name:'£ Pound' }, { id:'¥', name:'¥ Yen' }] },
@@ -3122,7 +3150,7 @@
       });
 
       domt.addType('cs-newsletter', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-nl-btncolor') ? { type: 'cs-newsletter' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-nl-btncolor')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-newsletter') ? { type: 'cs-newsletter' } : undefined; },
         model: { defaults: { tagName: 'div', traits: [
           { type: 'text',  name: 'data-nl-btntext',     label: 'Button Text', changeProp: 0 },
           { type: 'text',  name: 'data-nl-placeholder', label: 'Input Placeholder', changeProp: 0 },
@@ -3131,7 +3159,7 @@
       });
 
       domt.addType('cs-cookie', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-cookie-text') ? { type: 'cs-cookie' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-cookie-text')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-cookie') ? { type: 'cs-cookie' } : undefined; },
         model: { defaults: { tagName: 'div', traits: [
           { type: 'text', name: 'data-cookie-text',    label: 'Banner Text', changeProp: 0 },
           { type: 'text', name: 'data-cookie-accept',  label: 'Accept Button', changeProp: 0 },
@@ -3141,7 +3169,7 @@
       });
 
       domt.addType('cs-map', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-map-url') ? { type: 'cs-map' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-map-url')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-map') ? { type: 'cs-map' } : undefined; },
         model: { defaults: { tagName: 'div', traits: [
           { type: 'text',  name: 'data-map-url',       label: 'Google Maps Embed URL', changeProp: 0 },
           { type: 'text',  name: 'data-map-address',   label: 'Address Text', changeProp: 0 },
@@ -3151,7 +3179,7 @@
       });
 
       domt.addType('cs-counter', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-counter-bg') ? { type: 'cs-counter' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-counter-bg')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-counter') ? { type: 'cs-counter' } : undefined; },
         model: { defaults: { tagName: 'div', traits: [
           { type: 'color',    name: 'data-counter-bg',       label: 'Background Color', changeProp: 0 },
           { type: 'checkbox', name: 'data-counter-animate',  label: 'Animate on Scroll', changeProp: 0, valueTrue: '1', valueFalse: '0' },
@@ -3161,7 +3189,7 @@
       });
 
       domt.addType('cs-navbar', {
-        isComponent: function(el) { return el.hasAttribute && el.hasAttribute('data-nav-bg') ? { type: 'cs-navbar' } : undefined; },
+        isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-nav-bg')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-navbar') ? { type: 'cs-navbar' } : undefined; },
         model: { defaults: { tagName: 'div', traits: [
           { type: 'text',   name: 'data-nav-logo',      label: 'Logo Text', changeProp: 0 },
           { type: 'color',  name: 'data-nav-bg',        label: 'Nav Background', changeProp: 0 },
@@ -3238,6 +3266,7 @@
           walk(model);
           return found;
         }
+
 
         // ── NAVBAR ───────────────────────────────────────────────────────────
         if ('data-nav-bg' in attrs || 'data-nav-logo' in attrs) {
@@ -3464,7 +3493,7 @@
         }
 
         // ── VIDEO HERO ──────────────────────────────────────────────────────
-        if ('data-vh-url' in attrs) {
+        if ('data-vh-url' in attrs || 'data-vh-type' in attrs) {
           model.on('change:attributes', function(m) {
             var changed = (m.changed && m.changed.attributes) || {};
             var a = model.getAttributes();
@@ -3472,9 +3501,52 @@
             var el = section.getEl && section.getEl();
             if (!el) return;
 
-            if ('data-vh-url' in changed) {
-              var src = el.querySelector('source');
-              if (src) { src.src = a['data-vh-url']; var v = src.parentNode; v.load(); }
+            if ('data-vh-type' in changed || 'data-vh-url' in changed || 'data-vh-id' in changed || 'data-vh-autoplay' in changed || 'data-vh-loop' in changed) {
+              var type = a['data-vh-type'] || 'mp4';
+              var autoplay = a['data-vh-autoplay'] === '1';
+              var loop = a['data-vh-loop'] === '1';
+              var container = el.querySelector('.cs-video-container');
+              if (!container) {
+                 // create container if not exists (old blocks)
+                 container = document.createElement('div');
+                 container.className = 'cs-video-container';
+                 container.style = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;overflow:hidden;';
+                 el.insertBefore(container, el.firstChild);
+              }
+              container.innerHTML = '';
+
+              if (type === 'mp4') {
+                var video = document.createElement('video');
+                video.style = 'position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;transform:translate(-50%,-50%);object-fit:cover;';
+                if (autoplay) video.setAttribute('autoplay', 'true');
+                if (loop) video.setAttribute('loop', 'true');
+                video.setAttribute('muted', 'true');
+                video.setAttribute('playsinline', 'true');
+                var source = document.createElement('source');
+                source.src = a['data-vh-url'] || 'https://www.w3schools.com/html/mov_bbb.mp4';
+                source.type = 'video/mp4';
+                video.appendChild(source);
+                container.appendChild(video);
+                video.load();
+              } else if (type === 'youtube') {
+                var id = a['data-vh-id'] || 'dQw4w9WgXcQ';
+                var iframe = document.createElement('iframe');
+                var params = ['controls=0', 'showinfo=0', 'rel=0', 'mute=1', 'iv_load_policy=3', 'enablejsapi=1'];
+                if (autoplay) params.push('autoplay=1');
+                if (loop) params.push('loop=1', 'playlist=' + id);
+                iframe.src = 'https://www.youtube.com/embed/' + id + '?' + params.join('&');
+                iframe.style = 'position:absolute;top:50%;left:50%;width:100vw;height:56.25vw;min-height:100vh;min-width:177.77vh;transform:translate(-50%,-50%);pointer-events:none;border:none;';
+                container.appendChild(iframe);
+              } else if (type === 'vimeo') {
+                var id = a['data-vh-id'] || '76979871';
+                var iframe = document.createElement('iframe');
+                var params = ['background=1', 'muted=1'];
+                if (autoplay) params.push('autoplay=1');
+                if (loop) params.push('loop=1');
+                iframe.src = 'https://player.vimeo.com/video/' + id + '?' + params.join('&');
+                iframe.style = 'position:absolute;top:50%;left:50%;width:100vw;height:56.25vw;min-height:100vh;min-width:177.77vh;transform:translate(-50%,-50%);pointer-events:none;border:none;';
+                container.appendChild(iframe);
+              }
             }
             if ('data-vh-height' in changed) {
               section.addStyle({ 'height': a['data-vh-height'] || '500px' });
@@ -3504,20 +3576,26 @@
             if ('data-gal-bg' in changed) {
               section.addStyle({ 'background': a['data-gal-bg'] || '#ffffff' });
             }
-            var el = section.getEl && section.getEl();
-            if (!el) return;
-            var grid = el.querySelector('.cs-gal-grid');
-            if (!grid) return;
-            if ('data-gal-cols' in changed) {
-              grid.style.gridTemplateColumns = 'repeat(' + (a['data-gal-cols'] || '3') + ',1fr)';
-            }
-            if ('data-gal-gap' in changed) {
-              grid.style.gap = a['data-gal-gap'] || '12px';
+            if ('data-gal-cols' in changed || 'data-gal-gap' in changed) {
+              var cols = a['data-gal-cols'] || '3';
+              var gap = a['data-gal-gap'] || '12px';
+              var grid = findByClass(section, 'cs-gal-grid');
+              if (grid) {
+                grid.addStyle({ 'display': 'grid', 'grid-template-columns': 'repeat(' + cols + ',1fr)', 'gap': gap });
+              }
             }
             if ('data-gal-radius' in changed) {
-              grid.querySelectorAll('div[style*="background:url"]').forEach(function(d) {
-                d.style.borderRadius = a['data-gal-radius'] || '6px';
-              });
+              var radius = a['data-gal-radius'] || '6px';
+              function setRadius(cm) {
+                cm.components().each(function(c) {
+                  var cl = (c.getAttributes ? c.getAttributes().class : '') || '';
+                  if (cl.split(' ').indexOf('cs-gal-img') !== -1) {
+                    c.addStyle({ 'border-radius': radius });
+                  }
+                  setRadius(c);
+                });
+              }
+              setRadius(section);
             }
           });
         }
@@ -3619,20 +3697,26 @@
             if ('data-lb-bg' in changed) {
               section.addStyle({ 'background': a['data-lb-bg'] || '#ffffff' });
             }
-            var el = section.getEl && section.getEl();
-            if (!el) return;
-            var grid = el.querySelector('.cs-lb-grid');
-            if (!grid) return;
-            if ('data-lb-cols' in changed) {
-              grid.style.gridTemplateColumns = 'repeat(' + (a['data-lb-cols'] || '3') + ',1fr)';
-            }
-            if ('data-lb-gap' in changed) {
-              grid.style.gap = a['data-lb-gap'] || '12px';
+            if ('data-lb-cols' in changed || 'data-lb-gap' in changed) {
+              var cols = a['data-lb-cols'] || '3';
+              var gap = a['data-lb-gap'] || '12px';
+              var grid = findByClass(section, 'cs-lb-grid');
+              if (grid) {
+                grid.addStyle({ 'display': 'grid', 'grid-template-columns': 'repeat(' + cols + ',1fr)', 'gap': gap });
+              }
             }
             if ('data-lb-radius' in changed) {
-              grid.querySelectorAll('div[onclick]').forEach(function(d) {
-                d.style.borderRadius = a['data-lb-radius'] || '8px';
-              });
+              var radius = a['data-lb-radius'] || '8px';
+              function setRadius(cm) {
+                cm.components().each(function(c) {
+                  var cl = (c.getAttributes ? c.getAttributes().class : '') || '';
+                  if (cl.split(' ').indexOf('cs-lb-img') !== -1) {
+                    c.addStyle({ 'border-radius': radius });
+                  }
+                  setRadius(c);
+                });
+              }
+              setRadius(section);
             }
           });
         }
@@ -3747,7 +3831,11 @@
           tagName: 'div',
           attributes: {
             'data-gjs-type': 'cs-video-hero',
+            'data-vh-type':    'mp4',
             'data-vh-url':     'https://www.w3schools.com/html/mov_bbb.mp4',
+            'data-vh-id':      'dQw4w9WgXcQ',
+            'data-vh-autoplay': '1',
+            'data-vh-loop':     '1',
             'data-vh-height':  '500px',
             'data-vh-overlay': '0.5',
             'data-vh-ovcolor': '#000000',
@@ -3758,8 +3846,12 @@
               tagName: 'section',
               attributes: { style: 'position:relative;height:500px;overflow:hidden;font-family:Helvetica,sans-serif;display:flex;align-items:center;justify-content:center;text-align:center;' },
               components: [
-                { tagName: 'video', attributes: { style: 'position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;transform:translate(-50%,-50%);object-fit:cover;z-index:0;', autoplay: 'true', muted: 'true', loop: 'true', playsinline: 'true' },
-                  components: [{ tagName: 'source', attributes: { src: 'https://www.w3schools.com/html/mov_bbb.mp4', type: 'video/mp4' } }] },
+                { tagName: 'div', attributes: { class: 'cs-video-container', style: 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;overflow:hidden;' },
+                  components: [
+                    { tagName: 'video', attributes: { style: 'position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;transform:translate(-50%,-50%);object-fit:cover;', autoplay: 'true', muted: 'true', loop: 'true', playsinline: 'true' },
+                      components: [{ tagName: 'source', attributes: { src: 'https://www.w3schools.com/html/mov_bbb.mp4', type: 'video/mp4' } }] }
+                  ]
+                },
                 { tagName: 'div', attributes: { style: 'position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:1;' } },
                 { tagName: 'div', attributes: { style: 'position:relative;z-index:2;color:#ffffff;padding:20px;' },
                   components: [
@@ -3802,12 +3894,12 @@
                 { tagName: 'h2', attributes: { style: 'font-size:2em;font-weight:700;color:#333;margin-bottom:40px;' }, components: [{ type: 'text', content: 'Gallery' }] },
                 { tagName: 'div', attributes: { class: 'cs-gal-grid', style: 'display:grid;grid-template-columns:repeat(3,1fr);gap:12px;' },
                   components: [
-                    { tagName: 'div', attributes: { style: 'height:220px;background:url(https://picsum.photos/seed/g1/400/300) center/cover;border-radius:6px;transition:transform .3s;' } },
-                    { tagName: 'div', attributes: { style: 'height:220px;background:url(https://picsum.photos/seed/g2/400/300) center/cover;border-radius:6px;transition:transform .3s;' } },
-                    { tagName: 'div', attributes: { style: 'height:220px;background:url(https://picsum.photos/seed/g3/400/300) center/cover;border-radius:6px;transition:transform .3s;' } },
-                    { tagName: 'div', attributes: { style: 'height:220px;background:url(https://picsum.photos/seed/g4/400/300) center/cover;border-radius:6px;transition:transform .3s;' } },
-                    { tagName: 'div', attributes: { style: 'height:220px;background:url(https://picsum.photos/seed/g5/400/300) center/cover;border-radius:6px;transition:transform .3s;' } },
-                    { tagName: 'div', attributes: { style: 'height:220px;background:url(https://picsum.photos/seed/g6/400/300) center/cover;border-radius:6px;transition:transform .3s;' } },
+                    { tagName: 'div', attributes: { class: 'cs-gal-img', style: 'height:220px;background:url(https://picsum.photos/seed/g1/400/300) center/cover;border-radius:6px;transition:transform .3s;' } },
+                    { tagName: 'div', attributes: { class: 'cs-gal-img', style: 'height:220px;background:url(https://picsum.photos/seed/g2/400/300) center/cover;border-radius:6px;transition:transform .3s;' } },
+                    { tagName: 'div', attributes: { class: 'cs-gal-img', style: 'height:220px;background:url(https://picsum.photos/seed/g3/400/300) center/cover;border-radius:6px;transition:transform .3s;' } },
+                    { tagName: 'div', attributes: { class: 'cs-gal-img', style: 'height:220px;background:url(https://picsum.photos/seed/g4/400/300) center/cover;border-radius:6px;transition:transform .3s;' } },
+                    { tagName: 'div', attributes: { class: 'cs-gal-img', style: 'height:220px;background:url(https://picsum.photos/seed/g2/400/300) center/cover;border-radius:6px;transition:transform .3s;' } },
+                    { tagName: 'div', attributes: { class: 'cs-gal-img', style: 'height:220px;background:url(https://picsum.photos/seed/g6/400/300) center/cover;border-radius:6px;transition:transform .3s;' } },
                   ]
                 },
               ]
@@ -4111,24 +4203,27 @@
                 { tagName: 'h2', attributes: { style: 'font-size:2em;font-weight:700;color:#333;margin-bottom:40px;' }, components: [{ type: 'text', content: 'Gallery' }] },
                 { tagName: 'div', attributes: { class: 'cs-lb-grid', style: 'display:grid;grid-template-columns:repeat(3,1fr);gap:12px;' },
                   components: [
-                    { tagName: 'div', attributes: { onclick: 'csLbOpen(this)', style: 'height:200px;background:url(https://picsum.photos/seed/lb1/600/400) center/cover;border-radius:8px;cursor:pointer;transition:transform .3s;', 'data-full': 'https://picsum.photos/seed/lb1/1200/800' } },
-                    { tagName: 'div', attributes: { onclick: 'csLbOpen(this)', style: 'height:200px;background:url(https://picsum.photos/seed/lb2/600/400) center/cover;border-radius:8px;cursor:pointer;transition:transform .3s;', 'data-full': 'https://picsum.photos/seed/lb2/1200/800' } },
-                    { tagName: 'div', attributes: { onclick: 'csLbOpen(this)', style: 'height:200px;background:url(https://picsum.photos/seed/lb3/600/400) center/cover;border-radius:8px;cursor:pointer;transition:transform .3s;', 'data-full': 'https://picsum.photos/seed/lb3/1200/800' } },
-                    { tagName: 'div', attributes: { onclick: 'csLbOpen(this)', style: 'height:200px;background:url(https://picsum.photos/seed/lb4/600/400) center/cover;border-radius:8px;cursor:pointer;transition:transform .3s;', 'data-full': 'https://picsum.photos/seed/lb4/1200/800' } },
-                    { tagName: 'div', attributes: { onclick: 'csLbOpen(this)', style: 'height:200px;background:url(https://picsum.photos/seed/lb5/600/400) center/cover;border-radius:8px;cursor:pointer;transition:transform .3s;', 'data-full': 'https://picsum.photos/seed/lb5/1200/800' } },
-                    { tagName: 'div', attributes: { onclick: 'csLbOpen(this)', style: 'height:200px;background:url(https://picsum.photos/seed/lb6/600/400) center/cover;border-radius:8px;cursor:pointer;transition:transform .3s;', 'data-full': 'https://picsum.photos/seed/lb6/1200/800' } },
+                    { tagName: 'div', attributes: { class: 'cs-lb-img', onclick: 'csLbOpen(this)', style: 'height:200px;background:url(https://picsum.photos/seed/lb1/600/400) center/cover;border-radius:8px;cursor:pointer;transition:transform .3s;', 'data-full': 'https://picsum.photos/seed/lb1/1200/800' } },
+                    { tagName: 'div', attributes: { class: 'cs-lb-img', onclick: 'csLbOpen(this)', style: 'height:200px;background:url(https://picsum.photos/seed/lb2/600/400) center/cover;border-radius:8px;cursor:pointer;transition:transform .3s;', 'data-full': 'https://picsum.photos/seed/lb2/1200/800' } },
+                    { tagName: 'div', attributes: { class: 'cs-lb-img', onclick: 'csLbOpen(this)', style: 'height:200px;background:url(https://picsum.photos/seed/lb3/600/400) center/cover;border-radius:8px;cursor:pointer;transition:transform .3s;', 'data-full': 'https://picsum.photos/seed/lb3/1200/800' } },
+                    { tagName: 'div', attributes: { class: 'cs-lb-img', onclick: 'csLbOpen(this)', style: 'height:200px;background:url(https://picsum.photos/seed/lb4/600/400) center/cover;border-radius:8px;cursor:pointer;transition:transform .3s;', 'data-full': 'https://picsum.photos/seed/lb4/1200/800' } },
+                    { tagName: 'div', attributes: { class: 'cs-lb-img', onclick: 'csLbOpen(this)', style: 'height:200px;background:url(https://picsum.photos/seed/lb5/600/400) center/cover;border-radius:8px;cursor:pointer;transition:transform .3s;', 'data-full': 'https://picsum.photos/seed/lb5/1200/800' } },
+                    { tagName: 'div', attributes: { class: 'cs-lb-img', onclick: 'csLbOpen(this)', style: 'height:200px;background:url(https://picsum.photos/seed/lb6/600/400) center/cover;border-radius:8px;cursor:pointer;transition:transform .3s;', 'data-full': 'https://picsum.photos/seed/lb6/1200/800' } },
                   ]
                 },
               ]
             },
-            { tagName: 'div', attributes: { id: 'cs-lb-overlay', onclick: "this.style.display='none'", style: 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out;' },
+            { tagName: 'div', attributes: { id: 'cs-lb-overlay', style: 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;align-items:center;justify-content:center;cursor:zoom-out;' },
               components: [
                 { tagName: 'img', attributes: { id: 'cs-lb-img', src: '', style: 'max-width:90vw;max-height:90vh;border-radius:8px;pointer-events:none;' } },
-                { tagName: 'button', attributes: { onclick: "document.getElementById('cs-lb-overlay').style.display='none'", style: 'position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:2em;cursor:pointer;' }, components: [{ type: 'text', content: '✕' }] },
+                { tagName: 'button', attributes: { style: 'position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:2em;cursor:pointer;' }, components: [{ type: 'text', content: '✕' }] },
               ]
             },
             { tagName: 'style', components: [{ type: 'text', content: '.cs-lb-grid div:hover{transform:scale(1.04);}@media(max-width:600px){.cs-lb-grid{grid-template-columns:repeat(2,1fr)!important;}}' }] },
-            { tagName: 'script', components: [{ type: 'text', content: 'function csLbOpen(el){var ov=document.getElementById("cs-lb-overlay");var img=document.getElementById("cs-lb-img");img.src=el.dataset.full||"";ov.style.display="flex";}' }] },
+            {
+              tagName: 'script',
+              components: [{ type: 'text', content: 'window.csLbOpen = function(el) { var ov = document.getElementById("cs-lb-overlay"); var img = document.getElementById("cs-lb-img"); if(!ov || !img) return; img.src = el.dataset.full || ""; ov.style.display = "flex"; ov.onclick = function() { ov.style.display = "none"; }; var btn = ov.querySelector("button"); if(btn) btn.onclick = function(e) { e.stopPropagation(); ov.style.display = "none"; }; };' }]
+            },
           ],
           traits: [
             { type: 'select', name: 'data-lb-cols',   label: 'Columns',      changeProp: 0,
