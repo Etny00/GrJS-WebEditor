@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>GrapesJS Editor - Custom Build</title>
+  <meta content="Best Free Open Source Responsive Websites Builder" name="description">
+  <link rel="stylesheet" href="stylesheets/toastr.min.css">
+  <link rel="stylesheet" href="stylesheets/grapes.min.css?v0.21.10">
+  <link rel="stylesheet" href="stylesheets/grapesjs-preset-webpage.min.css">
+  <link rel="stylesheet" href="stylesheets/tooltip.css">
+  <link rel="stylesheet" href="stylesheets/demos.css?v3">
+  <link href="https://unpkg.com/grapick/dist/grapick.min.css" rel="stylesheet">
+
+  <script src="https://unpkg.com/grapick"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="js/toastr.min.js"></script>
+  <script src="js/grapes.min.js?v0.21.10"></script>
+
+  <!-- Base Plugins from CDN -->
+  <script src="https://unpkg.com/grapesjs-preset-webpage@1.0.2"></script>
+  <script src="https://unpkg.com/grapesjs-blocks-basic@1.0.1"></script>
+  <script src="https://unpkg.com/grapesjs-plugin-forms@2.0.5"></script>
+  <script src="https://unpkg.com/grapesjs-component-countdown@1.0.1"></script>
+  <script src="https://unpkg.com/grapesjs-plugin-export@1.0.11"></script>
+  <script src="https://unpkg.com/grapesjs-tabs@1.0.6"></script>
+  <script src="https://unpkg.com/grapesjs-custom-code@1.0.1"></script>
+  <script src="https://unpkg.com/grapesjs-touch@0.1.1"></script>
+  <script src="https://unpkg.com/grapesjs-parser-postcss@1.0.1"></script>
+  <script src="https://unpkg.com/grapesjs-tooltip@0.1.7"></script>
+  <script src="https://unpkg.com/grapesjs-tui-image-editor@0.1.3"></script>
+  <script src="https://unpkg.com/grapesjs-typed@1.0.5"></script>
+  <script src="https://unpkg.com/grapesjs-style-bg@2.0.1"></script>
+  <script src="https://unpkg.com/grapesjs-navbar@1.0.1"></script>
+  <script src="https://unpkg.com/grapesjs-lory-slider@1.0.1"></script>
+  <script src="https://unpkg.com/grapesjs-blocks-flexbox@1.0.1"></script>
+  <script src="https://unpkg.com/grapesjs-style-filter@1.0.1"></script>
+
+  <style type="text/css">
+    /* Icons */
+    .icons-flex { background-size: 70% 65% !important; height: 15px; width: 17px; opacity: 0.9; }
+    .icon-dir-row { background: url("./img/flex-dir-row.png") no-repeat center; }
+    .icon-dir-row-rev { background: url("./img/flex-dir-row-rev.png") no-repeat center; }
+    .icon-dir-col { background: url("./img/flex-dir-col.png") no-repeat center; }
+    .icon-dir-col-rev { background: url("./img/flex-dir-col-rev.png") no-repeat center; }
+    .icon-just-start { background: url("./img/flex-just-start.png") no-repeat center; }
+    .icon-just-end { background: url("./img/flex-just-end.png") no-repeat center; }
+    .icon-just-sp-bet { background: url("./img/flex-just-sp-bet.png") no-repeat center; }
+    .icon-just-sp-ar { background: url("./img/flex-just-sp-ar.png") no-repeat center; }
+    .icon-just-sp-cent { background: url("./img/flex-just-sp-cent.png") no-repeat center; }
+    .icon-al-start { background: url("./img/flex-al-start.png") no-repeat center; }
+    .icon-al-end { background: url("./img/flex-al-end.png") no-repeat center; }
+    .icon-al-str { background: url("./img/flex-al-str.png") no-repeat center; }
+    .icon-al-center { background: url("./img/flex-al-center.png") no-repeat center; }
+
+    [data-tooltip]::after { background: rgba(51, 51, 51, 0.9); }
+    .gjs-pn-commands { min-height: 40px; }
+    #gjs-sm-float { display: none; }
+    .gjs-logo-version { background-color: #756467; }
+
+    .gjs-pn-btn.gjs-pn-active,
+    .gjs-pn-btn.gjs-pn-active .fa,
+    .gjs-pn-btn.gjs-pn-active i,
+    .gjs-pn-btn.gjs-pn-active span {
+      box-shadow: none;
+      color: #8B9FE0 !important;
+    }
+
+    .gjs-pn-btn:hover, .gjs-pn-btn:hover .fa, .gjs-pn-btn:hover i { color: #a8b8e8 !important; }
+    .CodeMirror { min-height: 450px; margin-bottom: 8px; }
+    .grp-handler-close { background-color: transparent; color: #ddd; }
+    .grp-handler-cp-wrap { border-color: transparent; }
+    .gjs-pn-panel#gjs-pn-views-container, .gjs-pn-panel.gjs-pn-views-container { height: 100% !important; }
+
+    /* UI Theme: Blue-Grey #3A3B46 */
+    .gjs-one-bg, .gjs-pn-panel, .gjs-pn-views, .gjs-pn-options, .gjs-pn-commands,
+    .gjs-pn-views-container, #gjs-pn-views-container, .gjs-editor, .gjs-blocks-c,
+    .gjs-sm-sectors, .gjs-clm-tags, .gjs-trt-traits, .gjs-layer-title, .gjs-layers-c {
+      background-color: #3A3B46 !important;
+    }
+
+    .gjs-two-color, .gjs-pn-btn, .gjs-block, .gjs-layer, .gjs-sm-sector-title,
+    .gjs-block-category .gjs-title, .gjs-clm-header, .gjs-clm-tags-field {
+      background-color: #31323C !important;
+    }
+
+    .gjs-block-category .gjs-title, .gjs-sm-sector-title {
+      display: flex !important; align-items: center !important; gap: 8px !important;
+      padding: 11px 14px !important; cursor: pointer !important; font-size: 12px !important;
+      font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;
+      user-select: none !important; transition: background 0.15s !important;
+      border-bottom: 1px solid #2a2b34 !important; position: relative !important;
+    }
+
+    .gjs-block-category .gjs-title:hover, .gjs-sm-sector-title:hover { background-color: #45465A !important; }
+    .gjs-block-category .gjs-title::after, .gjs-sm-sector-title::after {
+      content: '\f078'; font-family: FontAwesome; font-size: 10px; margin-left: auto;
+      opacity: 0.5; transition: transform 0.2s; flex-shrink: 0;
+    }
+    .gjs-block-category.gjs-open .gjs-title::after, .gjs-sm-sector.gjs-open .gjs-sm-sector-title::after { transform: rotate(180deg); }
+    .gjs-three-bg, .gjs-block:hover, .gjs-pn-btn:hover, .gjs-layer:hover { background-color: #45465A !important; }
+    .gjs-four-color, .gjs-four-color-h:hover { color: #8B9FE0 !important; }
+
+    .gjs-pn-btn, .gjs-pn-btn .fa, .gjs-pn-btn i, .gjs-block-label, .gjs-block .fa,
+    .gjs-block i, .gjs-block i.fa, .gjs-block i[class*="fa"], .gjs-block [class*="fa-"],
+    .gjs-block span.fa, .gjs-block span[class*="fa"], .gjs-sm-label, .gjs-sm-sector-title,
+    .gjs-trt-trait__label, .gjs-layer-name, .gjs-layer-title .fa, .gjs-title,
+    .gjs-clm-header, .gjs-clm-label, .gjs-off-prv, .gjs-mdl-title, .gjs-logo {
+      color: #c8c8c8 !important;
+    }
+
+    .gjs-blocks-c .gjs-block.fa, .gjs-blocks-c .gjs-block[class*="fa-"] { color: #c8c8c8 !important; }
+    .gjs-logo-version { background-color: #45465A !important; }
+
+    .gjs-block .gjs-block-svg, .gjs-block svg, .gjs-block-media svg, .gjs-block-media .gjs-block-svg {
+      width: 100% !important; height: 100% !important; max-width: 34px; max-height: 34px; fill: #c8c8c8 !important;
+    }
+    .gjs-block .fa, .gjs-block-media .fa, .gjs-block-media i { font-size: 34px !important; color: #c8c8c8 !important; }
+    .gjs-block svg path, .gjs-block svg rect, .gjs-block svg circle, .gjs-block svg polygon, .gjs-block svg polyline, .gjs-block svg line, .gjs-block-media svg path, .gjs-block-media svg rect, .gjs-block-media svg circle {
+      fill: #c8c8c8 !important; stroke: none !important;
+    }
+
+    /* Site Settings Panel Styles */
+    .gjs-pn-views-container.ss-active .gjs-sm-sectors, .gjs-pn-views-container.ss-active .gjs-blocks-c,
+    .gjs-pn-views-container.ss-active .gjs-layer-manager, .gjs-pn-views-container.ss-active .gjs-layers-c,
+    .gjs-pn-views-container.ss-active .gjs-traits-cs, .gjs-pn-views-container.ss-active .gjs-clm-tags,
+    .gjs-pn-views-container.ss-active .gjs-trt-traits {
+      visibility: hidden !important; pointer-events: none !important; position: absolute !important;
+      height: 0 !important; overflow: hidden !important;
+    }
+    .gjs-pn-views-container.ss-active { overflow-y: auto !important; overflow-x: hidden !important; }
+
+    #site-settings-panel { display: none; height: 100%; overflow-y: auto; background-color: #3A3B46; color: #c8c8c8; font-family: Helvetica, Arial, sans-serif; font-size: 13px; }
+    #site-settings-panel.ss-visible { display: block; }
+    .ss-section { border-bottom: 1px solid #2a2b34; }
+    .ss-section-title { display: flex; align-items: center; gap: 8px; padding: 11px 14px; cursor: pointer; background-color: #31323C; color: #c8c8c8; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; user-select: none; transition: background 0.15s; }
+    .ss-section-title:hover { background-color: #45465A; }
+    .ss-section-title .ss-chevron { margin-left: auto; transition: transform 0.2s; opacity: 0.5; font-size: 10px; }
+    .ss-section-title.ss-open .ss-chevron { transform: rotate(180deg); }
+    .ss-section-body { display: none; padding: 14px; background-color: #3A3B46; }
+    .ss-section-body.ss-open { display: block; }
+    .ss-field { margin-bottom: 12px; }
+    .ss-label { display: block; font-size: 11px; color: #aaa; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .ss-input, .ss-select, .ss-textarea { width: 100%; background: #2a2b34; border: 1px solid #4a4b5a; color: #ddd; padding: 7px 9px; border-radius: 3px; font-size: 12px; box-sizing: border-box; outline: none; }
+    .ss-input:focus, .ss-textarea:focus { border-color: #8B9FE0; }
+    .ss-textarea { min-height: 110px; resize: vertical; font-family: 'Courier New', monospace; }
+    .ss-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .ss-row .ss-field { flex: 1; margin-bottom: 0; }
+    .ss-color-list { display: flex; flex-direction: column; gap: 8px; }
+    .ss-color-row { display: flex; align-items: center; gap: 8px; }
+    .ss-color-swatch { width: 28px; height: 28px; border-radius: 4px; border: 1px solid #555; cursor: pointer; flex-shrink: 0; position: relative; overflow: hidden; }
+    .ss-color-swatch input[type="color"] { position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px); opacity: 0; cursor: pointer; border: none; padding: 0; }
+    .ss-color-name { flex: 1; font-size: 12px; color: #c8c8c8; }
+    .ss-color-hex { width: 80px; background: #2a2b34; border: 1px solid #4a4b5a; color: #ddd; padding: 5px 7px; border-radius: 3px; font-size: 11px; outline: none; font-family: monospace; }
+    .ss-add-btn { width: 100%; margin-top: 8px; padding: 7px; background: #45465A; border: 1px dashed #6668a0; color: #8B9FE0; border-radius: 3px; cursor: pointer; font-size: 12px; text-align: center; transition: background 0.15s; }
+    .ss-add-btn:hover { background: #4f5070; }
+    .ss-apply-btn { width: 100%; padding: 9px; background: #8B9FE0; border: none; color: #1a1b24; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: 700; margin-top: 6px; transition: background 0.15s; }
+    .ss-apply-btn:hover { background: #a5b4f0; }
+    .ss-font-list { display: flex; flex-direction: column; gap: 8px; }
+    .ss-font-row { display: flex; align-items: center; gap: 8px; }
+    .ss-font-tag { flex-shrink: 0; font-size: 10px; background: #45465A; color: #aaa; padding: 2px 6px; border-radius: 3px; min-width: 52px; text-align: center; }
+    .ss-font-select { flex: 1; background: #2a2b34; border: 1px solid #4a4b5a; color: #ddd; padding: 6px 8px; border-radius: 3px; font-size: 12px; outline: none; }
+    .ss-img-drop { border: 2px dashed #4a4b5a; border-radius: 5px; padding: 18px 14px; text-align: center; color: #777; font-size: 12px; cursor: pointer; transition: border-color 0.15s; position: relative; z-index: 1; }
+    .ss-img-drop:hover { border-color: #8B9FE0; color: #aaa; }
+    .ss-img-drop i { display: block; font-size: 22px; margin-bottom: 6px; color: #555; }
+    .ss-img-preview { display: none; width: 100%; max-height: 80px; object-fit: contain; border-radius: 4px; margin-top: 8px; }
+
+    /* Project Manager Modal Styles */
+    #pm-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); z-index: 99999; align-items: center; justify-content: center; }
+    #pm-overlay.pm-visible { display: flex; }
+    #pm-modal { background: #2a2b34; border-radius: 10px; width: 620px; max-width: 95vw; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); font-family: Helvetica, Arial, sans-serif; overflow: hidden; }
+    #pm-header { display: flex; align-items: center; padding: 16px 20px; background: #31323C; border-bottom: 1px solid #1e1f28; gap: 10px; flex-shrink: 0; }
+    #pm-header h2 { flex: 1; margin: 0; font-size: 14px; font-weight: 700; color: #c8c8c8; text-transform: uppercase; letter-spacing: 1px; }
+    #pm-close { background: none; border: none; color: #888; font-size: 18px; cursor: pointer; padding: 2px 6px; border-radius: 3px; line-height: 1; }
+    #pm-close:hover { color: #fff; background: #45465A; }
+    #pm-tabs { display: flex; background: #31323C; border-bottom: 1px solid #1e1f28; flex-shrink: 0; }
+    .pm-tab { flex: 1; padding: 10px; background: none; border: none; color: #888; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+    .pm-tab:hover { color: #c8c8c8; }
+    .pm-tab.pm-tab-active { color: #8B9FE0; border-bottom-color: #8B9FE0; }
+    .pm-pane { display: none; flex: 1; overflow-y: auto; padding: 20px; }
+    .pm-pane.pm-pane-active { display: flex; flex-direction: column; gap: 14px; }
+    .pm-save-row { display: flex; gap: 8px; }
+    .pm-input { flex: 1; background: #1e1f28; border: 1px solid #4a4b5a; color: #ddd; padding: 9px 12px; border-radius: 4px; font-size: 13px; outline: none; }
+    .pm-input:focus { border-color: #8B9FE0; }
+    .pm-btn { padding: 9px 18px; background: #8B9FE0; border: none; color: #1a1b24; border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+    .pm-btn:hover { background: #a5b4f0; }
+    .pm-btn-danger { background: #c0392b; color: #fff; }
+    .pm-btn-danger:hover { background: #e74c3c; }
+    .pm-btn-ghost { background: #45465A; color: #c8c8c8; }
+    .pm-btn-ghost:hover { background: #555670; }
+    .pm-project-list { display: flex; flex-direction: column; gap: 8px; }
+    .pm-project-item { display: flex; align-items: center; gap: 10px; background: #31323C; border: 1px solid #3a3b46; border-radius: 6px; padding: 12px 14px; transition: border-color 0.15s; }
+    .pm-project-item:hover { border-color: #8B9FE0; }
+    .pm-project-icon { font-size: 18px; color: #8B9FE0; flex-shrink: 0; }
+    .pm-project-info { flex: 1; min-width: 0; }
+    .pm-project-name { font-size: 13px; font-weight: 700; color: #ddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pm-project-meta { font-size: 11px; color: #666; margin-top: 2px; }
+    .pm-project-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .pm-project-btn { padding: 5px 10px; font-size: 11px; font-weight: 600; border: none; border-radius: 3px; cursor: pointer; transition: background 0.15s; }
+    .pm-project-btn-load { background: #8B9FE0; color: #1a1b24; }
+    .pm-project-btn-load:hover { background: #a5b4f0; }
+    .pm-project-btn-del { background: #45465A; color: #c8c8c8; }
+    .pm-project-btn-del:hover { background: #c0392b; color: #fff; }
+    .pm-empty { text-align: center; color: #555; font-size: 13px; padding: 30px 0; }
+    .pm-empty i { font-size: 30px; display: block; margin-bottom: 10px; }
+    .pm-io-section { background: #31323C; border-radius: 6px; padding: 16px; border: 1px solid #3a3b46; }
+    .pm-io-title { font-size: 12px; font-weight: 700; color: #8B9FE0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .pm-io-desc { font-size: 12px; color: #777; margin-bottom: 12px; line-height: 1.5; }
+    .pm-io-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    #pm-import-file { display: none; }
+
+    /* Saved Blocks Dialog Styles */
+    #sb-name-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); z-index: 999999; align-items: center; justify-content: center; }
+    #sb-name-overlay.sb-visible { display: flex; }
+    #sb-name-dialog { background: #2a2b34; border-radius: 8px; padding: 22px 24px; width: 340px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5); font-family: Helvetica, Arial, sans-serif; }
+    #sb-name-dialog h3 { margin: 0 0 14px; font-size: 14px; font-weight: 700; color: #c8c8c8; display: flex; align-items: center; gap: 8px; }
+    #sb-name-dialog h3 i { color: #8B9FE0; }
+    #sb-name-input { width: 100%; background: #1e1f28; border: 1px solid #4a4b5a; color: #ddd; padding: 9px 12px; border-radius: 4px; font-size: 13px; outline: none; box-sizing: border-box; margin-bottom: 14px; }
+    #sb-name-input:focus { border-color: #8B9FE0; }
+    .sb-dialog-row { display: flex; gap: 8px; justify-content: flex-end; }
+    .sb-dialog-btn { padding: 8px 18px; border: none; border-radius: 4px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+    .sb-dialog-btn-cancel { background: #45465A; color: #c8c8c8; }
+    .sb-dialog-btn-cancel:hover { background: #555670; }
+    .sb-dialog-btn-save { background: #8B9FE0; color: #1a1b24; }
+    .sb-dialog-btn-save:hover { background: #a5b4f0; }
+
+    .gjs-block[data-sb-custom="1"] { position: relative; }
+    .gjs-block[data-sb-custom="1"] .sb-block-del { display: none; position: absolute; top: 3px; right: 3px; width: 16px; height: 16px; line-height: 16px; text-align: center; font-size: 10px; background: #c0392b; color: #fff; border-radius: 3px; cursor: pointer; z-index: 10; }
+    .gjs-block[data-sb-custom="1"]:hover .sb-block-del { display: block; }
+
+    .gjs-layer.gjs-selected .gjs-layer-name, .gjs-layer__t-default.gjs-selected .gjs-layer-name { color: #8B9FE0 !important; font-weight: 700 !important; }
+    .gjs-layer *, .gjs-layer-title, .gjs-layer-title *, .gjs-layer-name, .gjs-layer-caret, .gjs-layer-vis, .gjs-layer-move, .gjs-layer-count, .gjs-layer-icon, .gjs-layer-type, .gjs-layers-c > *, .gjs-layer-children * {
+      color: #c8c8c8 !important;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Project Manager Modal -->
+  <div id="pm-overlay">
+    <div id="pm-modal">
+      <div id="pm-header">
+        <i class="fa fa-folder-open" style="color:#8B9FE0"></i>
+        <h2>Project Manager</h2>
+        <button id="pm-close" title="Close">&#10005;</button>
+      </div>
+      <div id="pm-tabs">
+        <button class="pm-tab pm-tab-active" data-pm-tab="pm-pane-projects"><i class="fa fa-th-list"></i> My Projects</button>
+        <button class="pm-tab" data-pm-tab="pm-pane-save"><i class="fa fa-save"></i> Save</button>
+        <button class="pm-tab" data-pm-tab="pm-pane-io"><i class="fa fa-exchange"></i> Import / Export</button>
+      </div>
+      <div class="pm-pane pm-pane-active" id="pm-pane-projects"><div class="pm-project-list" id="pm-project-list"></div></div>
+      <div class="pm-pane" id="pm-pane-save">
+        <div style="font-size:12px;color:#888;margin-bottom:4px">Save current canvas as a new project or overwrite an existing one.</div>
+        <div class="pm-save-row"><input class="pm-input" type="text" id="pm-save-name" placeholder="Project name…"><button class="pm-btn" id="pm-save-btn"><i class="fa fa-save"></i> Save</button></div>
+      </div>
+      <div class="pm-pane" id="pm-pane-io">
+        <div class="pm-io-section"><div class="pm-io-title"><i class="fa fa-download"></i> Export Project</div><div class="pm-io-desc">Download as <strong>.json</strong>.</div><div class="pm-io-row"><button class="pm-btn" id="pm-export-json">Export .json</button></div></div>
+        <div class="pm-io-section"><div class="pm-io-title"><i class="fa fa-code"></i> Export HTML</div><div class="pm-io-desc">Download as <strong>.html</strong>.</div><div class="pm-io-row"><button class="pm-btn pm-btn-ghost" id="pm-export-html">Export .html</button></div></div>
+        <div class="pm-io-section"><div class="pm-io-title"><i class="fa fa-upload"></i> Import Project</div><div class="pm-io-desc">Load <strong>.json</strong> file.</div><div class="pm-io-row"><button class="pm-btn pm-btn-ghost" id="pm-import-btn">Choose .json</button><input type="file" id="pm-import-file" accept=".json"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Block Name Dialog -->
+  <div id="sb-name-overlay">
+    <div id="sb-name-dialog">
+      <h3><i class="fa fa-bookmark"></i> Save as Block</h3>
+      <input id="sb-name-input" type="text" placeholder="Block name..." maxlength="60">
+      <div class="sb-dialog-row">
+        <button class="sb-dialog-btn sb-dialog-btn-cancel" id="sb-name-cancel">Cancel</button>
+        <button class="sb-dialog-btn sb-dialog-btn-save" id="sb-name-confirm">Save Block</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Site Settings Panel (will be moved into GrapesJS container) -->
+  <div id="site-settings-panel">
+    <div class="ss-section">
+      <div class="ss-section-title" data-ss-target="ss-colors"><i class="fa fa-tint"></i> Global Colors<i class="fa fa-chevron-down ss-chevron"></i></div>
+      <div class="ss-section-body" id="ss-colors">
+        <div class="ss-color-list" id="ss-color-list">
+          <div class="ss-color-row"><div class="ss-color-swatch" style="background:#4d114f"><input type="color" value="#4d114f" data-ss-colorvar="--color-primary"></div><span class="ss-color-name">Primary</span><input class="ss-color-hex" type="text" value="#4d114f" data-ss-colorhex="--color-primary"></div>
+          <div class="ss-color-row"><div class="ss-color-swatch" style="background:#ffffff"><input type="color" value="#ffffff" data-ss-colorvar="--color-bg"></div><span class="ss-color-name">Background</span><input class="ss-color-hex" type="text" value="#ffffff" data-ss-colorhex="--color-bg"></div>
+        </div>
+        <button class="ss-add-btn" id="ss-add-color"><i class="fa fa-plus"></i> Add Color</button>
+        <button class="ss-apply-btn" id="ss-apply-colors">Apply Colors</button>
+      </div>
+    </div>
+    <div class="ss-section">
+        <div class="ss-section-title" data-ss-target="ss-fonts"><i class="fa fa-font"></i> Global Fonts<i class="fa fa-chevron-down ss-chevron"></i></div>
+        <div class="ss-section-body" id="ss-fonts">
+          <div class="ss-font-list">
+            <div class="ss-font-row"><span class="ss-font-tag">Heading</span><select class="ss-font-select" id="ss-font-heading"><option value="Helvetica, Arial, sans-serif" selected>Helvetica / Arial</option><option value="'Roboto', sans-serif">Roboto</option></select></div>
+            <div class="ss-font-row"><span class="ss-font-tag">Body</span><select class="ss-font-select" id="ss-font-body"><option value="Helvetica, Arial, sans-serif" selected>Helvetica / Arial</option><option value="'Roboto', sans-serif">Roboto</option></select></div>
+          </div>
+          <div class="ss-field" style="margin-top:12px"><label class="ss-label">Google Fonts URL</label><input class="ss-input" type="text" id="ss-gfont-url" placeholder="https://fonts.googleapis.com/css2?family=..."></div>
+          <button class="ss-apply-btn" id="ss-apply-fonts">Apply Fonts</button>
+        </div>
+    </div>
+    <div class="ss-section">
+        <div class="ss-section-title" data-ss-target="ss-typo"><i class="fa fa-text-height"></i> Typography<i class="fa fa-chevron-down ss-chevron"></i></div>
+        <div class="ss-section-body" id="ss-typo">
+          <div class="ss-row"><div class="ss-field"><label class="ss-label">Base Size</label><input class="ss-input" type="text" id="ss-typo-base" value="16px"></div><div class="ss-field"><label class="ss-label">Line Height</label><input class="ss-input" type="text" id="ss-typo-lh" value="1.6"></div></div>
+          <button class="ss-apply-btn" id="ss-apply-typo">Apply Typography</button>
+        </div>
+    </div>
+    <div class="ss-section">
+        <div class="ss-section-title" data-ss-target="ss-buttons"><i class="fa fa-hand-pointer-o"></i> Buttons<i class="fa fa-chevron-down ss-chevron"></i></div>
+        <div class="ss-section-body" id="ss-buttons">
+          <div class="ss-row"><div class="ss-field"><label class="ss-label">BG Color</label><div class="ss-color-swatch" style="background:#4d114f;width:100%"><input type="color" value="#4d114f" id="ss-btn-bg"></div></div><div class="ss-field"><label class="ss-label">Text Color</label><div class="ss-color-swatch" style="background:#ffffff;width:100%"><input type="color" value="#ffffff" id="ss-btn-color"></div></div></div>
+          <button class="ss-apply-btn" id="ss-apply-buttons">Apply Buttons</button>
+        </div>
+    </div>
+    <div class="ss-section">
+        <div class="ss-section-title" data-ss-target="ss-bg"><i class="fa fa-picture-o"></i> Background<i class="fa fa-chevron-down ss-chevron"></i></div>
+        <div class="ss-section-body" id="ss-bg">
+          <div class="ss-field"><label class="ss-label">Type</label><select class="ss-select" id="ss-bg-type"><option value="color">Solid Color</option><option value="gradient">Gradient</option><option value="image">Image</option></select></div>
+          <div id="ss-bg-color-wrap" class="ss-field"><label class="ss-label">Color</label><div style="display:flex;gap:8px;align-items:center"><div class="ss-color-swatch" style="background:#ffffff;flex-shrink:0"><input type="color" value="#ffffff" id="ss-bg-color"></div><input class="ss-color-hex" type="text" value="#ffffff" id="ss-bg-color-hex" style="flex:1"></div></div>
+          <div id="ss-bg-gradient-wrap" class="ss-field" style="display:none"><label class="ss-label">Gradient</label><input class="ss-input" type="text" id="ss-bg-gradient-custom" placeholder="linear-gradient(...)"></div>
+          <div id="ss-bg-image-wrap" class="ss-field" style="display:none"><label class="ss-label">Image URL</label><input class="ss-input" type="text" id="ss-bg-img-url" placeholder="https://..."></div>
+          <button class="ss-apply-btn" id="ss-apply-bg">Apply Background</button>
+        </div>
+    </div>
+    <div class="ss-section">
+        <div class="ss-section-title" data-ss-target="ss-layout"><i class="fa fa-th-large"></i> Layout<i class="fa fa-chevron-down ss-chevron"></i></div>
+        <div class="ss-section-body" id="ss-layout">
+          <div class="ss-field"><label class="ss-label">Wrapper Max-Width</label><input class="ss-input" type="text" id="ss-layout-maxw" value="1150px"></div>
+          <button class="ss-apply-btn" id="ss-apply-layout">Apply Layout</button>
+        </div>
+    </div>
+    <div class="ss-section">
+        <div class="ss-section-title" data-ss-target="ss-css"><i class="fa fa-code"></i> Custom CSS<i class="fa fa-chevron-down ss-chevron"></i></div>
+        <div class="ss-section-body" id="ss-css">
+          <textarea class="ss-textarea" id="ss-custom-css" placeholder="/* Your global CSS here */"></textarea>
+          <button class="ss-apply-btn" id="ss-apply-css">Inject CSS</button>
+        </div>
+    </div>
+  </div>
+
+  <div style="display: none">
+    <div class="gjs-logo-cont">
+      <a href="https://grapesjs.com"><img class="gjs-logo" src="img/grapesjs-logo-cl.png"></a>
+      <div class="gjs-logo-version"></div>
+    </div>
+  </div>
+
+  <div id="gjs" style="height:0px; overflow:hidden">
+    <header class="header-banner">
+      <div class="container-width">
+        <div class="logo-container"><div class="logo">GrapesJS</div></div>
+        <nav class="menu"><div class="menu-item">BUILDER</div></nav>
+        <div class="lead-title">Welcome to the New Editor</div>
+      </div>
+    </header>
+  </div>
+
+  <div id="info-panel" style="display:none">
+    <br /><div class="info-panel-label"><b>GrapesJS Editor</b> - Modularized and Cleaned Up.</div>
+  </div>
+
+  <!-- Core Editor Logic -->
+  <script src="js/editor-core.js"></script>
+  <!-- Editor Configuration & Dynamic Plugin Loading -->
+  <script src="js/editor-config.js"></script>
+</body>
+</html>
