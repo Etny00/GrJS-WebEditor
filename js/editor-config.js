@@ -23,47 +23,55 @@ var editorConfig = {
 
 // Global initialization logic
 (function() {
-    console.log('Loading Editor Configuration...');
+    console.log('--- Editor Loader Started ---');
 
     var loadedCount = 0;
     var pluginsToLoad = editorConfig.plugins;
     var totalToLoad = pluginsToLoad.length;
 
     function startEditor() {
-        console.log('Initializing GrapesJS...');
+        console.log('Initializing GrapesJS Editor...');
         if (typeof window.initEditor === 'function') {
             try {
                 window.editor = window.initEditor(editorConfig.plugins);
+                console.log('Editor initialized successfully.');
             } catch (e) {
-                console.error('Error during editor initialization:', e);
+                console.error('CRITICAL: Error during editor initialization:', e);
+                // Try to show something to the user if it fails
+                document.body.innerHTML += '<div style="position:fixed;top:0;left:0;width:100%;background:red;color:white;padding:20px;z-index:999999;">Editor failed to load. Check console for details.</div>';
             }
         } else {
-            console.error('initEditor function not found! Make sure js/editor-core.js is loaded.');
+            console.error('CRITICAL: initEditor function not found! Check js/editor-core.js load status.');
         }
+    }
+
+    function loadPlugin(index) {
+        if (index >= totalToLoad) {
+            startEditor();
+            return;
+        }
+
+        var pluginId = pluginsToLoad[index];
+        var script = document.createElement('script');
+        script.src = editorConfig.pluginFiles[pluginId] + '?t=' + Date.now();
+
+        script.onload = function() {
+            console.log('Plugin loaded: ' + pluginId);
+            loadPlugin(index + 1);
+        };
+
+        script.onerror = function() {
+            console.error('ERROR: Failed to load plugin: ' + pluginId + ' from ' + script.src);
+            loadPlugin(index + 1);
+        };
+
+        document.head.appendChild(script);
     }
 
     if (totalToLoad === 0) {
         startEditor();
     } else {
-        for (var i = 0; i < totalToLoad; i++) {
-            (function(pluginId) {
-                var script = document.createElement('script');
-                script.src = editorConfig.pluginFiles[pluginId];
-                script.onload = function() {
-                    loadedCount++;
-                    if (loadedCount === totalToLoad) {
-                        startEditor();
-                    }
-                };
-                script.onerror = function() {
-                    console.error('Failed to load plugin: ' + pluginId);
-                    loadedCount++;
-                    if (loadedCount === totalToLoad) {
-                        startEditor();
-                    }
-                };
-                document.head.appendChild(script);
-            })(pluginsToLoad[i]);
-        }
+        console.log('Loading ' + totalToLoad + ' plugins sequentially...');
+        loadPlugin(0);
     }
 })();
