@@ -1,5 +1,5 @@
-grapesjs.plugins.add('gjs-custom-basic', (editor, opts = {}) => {
-  const bm = editor.BlockManager;
+grapesjs.plugins.add('gjs-custom-basic', function(editor, opts) {
+  var bm = editor.BlockManager;
 
   bm.add('section-block', {
     label: 'Section', category: 'Basic', attributes: { class: 'fa fa-window-maximize' },

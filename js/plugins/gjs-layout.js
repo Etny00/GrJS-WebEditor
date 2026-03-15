@@ -1,5 +1,5 @@
-grapesjs.plugins.add('gjs-layout', (editor, opts = {}) => {
-  const bm = editor.BlockManager;
+grapesjs.plugins.add('gjs-layout', function(editor, opts) {
+  var bm = editor.BlockManager;
 
   bm.add('sidebar-layout', {
     label: 'Sidebar Layout', category: 'Layout', attributes: { class: 'fa fa-columns' },

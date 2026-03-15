@@ -1,6 +1,6 @@
-grapesjs.plugins.add('gjs-extra', (editor, opts = {}) => {
-  const bm = editor.BlockManager;
-  const domt = editor.DomComponents;
+grapesjs.plugins.add('gjs-extra', function(editor, opts) {
+  var bm = editor.BlockManager;
+  var domt = editor.DomComponents;
 
   bm.add('slider-block', {
     label: 'Slider', category: 'Extra', attributes: { class: 'fa fa-sliders' },
@@ -39,7 +39,7 @@ grapesjs.plugins.add('gjs-extra', (editor, opts = {}) => {
   });
 
   domt.addType('cs-counter', {
-    isComponent: el => (el.hasAttribute && el.hasAttribute('data-counter-bg')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-counter') ? { type: 'cs-counter' } : undefined,
+    isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-counter-bg')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-counter') ? { type: 'cs-counter' } : undefined; },
     model: { defaults: { tagName: 'div', traits: [
       { type: 'color',    name: 'data-counter-bg',       label: 'Background Color', changeProp: 0 },
       { type: 'checkbox', name: 'data-counter-animate',  label: 'Animate on Scroll', changeProp: 0, valueTrue: '1', valueFalse: '0' },
@@ -87,53 +87,61 @@ grapesjs.plugins.add('gjs-extra', (editor, opts = {}) => {
     ];
 
     configs.forEach(function (cfg) {
-      doc.querySelectorAll(cfg.wrap).forEach(function (el) {
-        if (el._csInited) return;
+      var els = doc.querySelectorAll(cfg.wrap);
+      for (var i = 0; i < els.length; i++) {
+        var el = els[i];
+        if (el._csInited) continue;
         el._csInited = true;
         el.setAttribute('data-cur', '0');
         var track = el.querySelector(cfg.track);
         var slides = track ? track.children : [];
         var n = slides.length;
-        if (!track || n === 0) return;
+        if (!track || n === 0) continue;
 
-        function goTo(i) {
-          i = ((i % n) + n) % n;
-          el.setAttribute('data-cur', i);
-          track.style.transform = 'translateX(-' + (i * 100) + '%)';
-          if (cfg.dot) {
-            el.querySelectorAll(cfg.dot).forEach(function (d, j) {
-              d.classList.toggle(cfg.dotOn, j === i);
-            });
-          }
-        }
+        (function(el, track, slides, n, cfg) {
+            function goTo(i) {
+                i = ((i % n) + n) % n;
+                el.setAttribute('data-cur', i);
+                track.style.transform = 'translateX(-' + (i * 100) + '%)';
+                if (cfg.dot) {
+                    var dots = el.querySelectorAll(cfg.dot);
+                    for (var j = 0; j < dots.length; j++) {
+                        dots[j].classList.toggle(cfg.dotOn, j === i);
+                    }
+                }
+            }
 
-        var prev = el.querySelector(cfg.prev);
-        var next = el.querySelector(cfg.next);
-        if (prev) prev.addEventListener('click', function (e) {
-          e.stopPropagation();
-          goTo(parseInt(el.getAttribute('data-cur') || 0) - 1);
-        });
-        if (next) next.addEventListener('click', function (e) {
-          e.stopPropagation();
-          goTo(parseInt(el.getAttribute('data-cur') || 0) + 1);
-        });
-        if (cfg.dot) {
-          el.querySelectorAll(cfg.dot).forEach(function (d, idx) {
-            d.addEventListener('click', function (e) {
-              e.stopPropagation();
-              goTo(idx);
+            var prev = el.querySelector(cfg.prev);
+            var next = el.querySelector(cfg.next);
+            if (prev) prev.addEventListener('click', function (e) {
+                e.stopPropagation();
+                goTo(parseInt(el.getAttribute('data-cur') || 0) - 1);
             });
-          });
-        }
-      });
+            if (next) next.addEventListener('click', function (e) {
+                e.stopPropagation();
+                goTo(parseInt(el.getAttribute('data-cur') || 0) + 1);
+            });
+            if (cfg.dot) {
+                var dots = el.querySelectorAll(cfg.dot);
+                for (var idx = 0; idx < dots.length; idx++) {
+                    (function(idx) {
+                        dots[idx].addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            goTo(idx);
+                        });
+                    })(idx);
+                }
+            }
+        })(el, track, slides, n, cfg);
+      }
     });
   }
 
-  editor.on('load', () => {
+  editor.on('load', function() {
     csInitSliders();
-    const frame = editor.Canvas.getFrameEl();
+    var frame = editor.Canvas.getFrameEl();
     if (frame) {
-      frame.addEventListener('load', () => {
+      frame.addEventListener('load', function() {
         setTimeout(csInitSliders, 200);
       });
     }

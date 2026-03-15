@@ -1,15 +1,16 @@
-grapesjs.plugins.add('gjs-media', (editor, opts = {}) => {
-  const bm = editor.BlockManager;
-  const domt = editor.DomComponents;
+grapesjs.plugins.add('gjs-media', function(editor, opts) {
+  var bm = editor.BlockManager;
+  var domt = editor.DomComponents;
 
   // -- Helper: find descendant by class --
   function findByClass(cm, className) {
     var found = null;
     function walk(m) {
       if (found) return;
-      var cl = (m.getAttributes ? m.getAttributes().class : '') || '';
+      var attributes = m.getAttributes ? m.getAttributes() : {};
+      var cl = attributes.class || '';
       if (cl.split(' ').indexOf(className) !== -1) { found = m; return; }
-      m.components && m.components().each(walk);
+      if (m.components) m.components().each(walk);
     }
     walk(cm);
     return found;
@@ -17,7 +18,7 @@ grapesjs.plugins.add('gjs-media', (editor, opts = {}) => {
 
   // Register Types
   domt.addType('cs-video-hero', {
-    isComponent: el => (el.hasAttribute && el.hasAttribute('data-vh-url')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-video-hero') ? { type: 'cs-video-hero' } : undefined,
+    isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-vh-url')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-video-hero') ? { type: 'cs-video-hero' } : undefined; },
     model: { defaults: { tagName: 'div', traits: [
       { type: 'select', name: 'data-vh-type', label: 'Video Type', changeProp: 0,
         options: [{ id:'mp4', name:'MP4 File' }, { id:'youtube', name:'YouTube' }, { id:'vimeo', name:'Vimeo' }] },
@@ -36,7 +37,7 @@ grapesjs.plugins.add('gjs-media', (editor, opts = {}) => {
   });
 
   domt.addType('cs-video-embed', {
-    isComponent: el => (el.hasAttribute && el.hasAttribute('data-vid-url')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-video-embed') ? { type: 'cs-video-embed' } : undefined,
+    isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-vid-url')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-video-embed') ? { type: 'cs-video-embed' } : undefined; },
     model: { defaults: { tagName: 'div', traits: [
       { type: 'text',     name: 'data-vid-url',      label: 'Embed URL', changeProp: 0 },
       { type: 'checkbox', name: 'data-vid-autoplay', label: 'Autoplay', changeProp: 0, valueTrue: '1', valueFalse: '0' },
@@ -45,7 +46,7 @@ grapesjs.plugins.add('gjs-media', (editor, opts = {}) => {
   });
 
   domt.addType('cs-image-gallery', {
-    isComponent: el => (el.hasAttribute && el.hasAttribute('data-gal-cols')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-image-gallery') ? { type: 'cs-image-gallery' } : undefined,
+    isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-gal-cols')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-image-gallery') ? { type: 'cs-image-gallery' } : undefined; },
     model: { defaults: { tagName: 'section', traits: [
       { type: 'select', name: 'data-gal-cols',   label: 'Columns', changeProp: 0,
         options: [{ id:'2', name:'2 Columns' }, { id:'3', name:'3 Columns' }, { id:'4', name:'4 Columns' }] },
@@ -58,7 +59,7 @@ grapesjs.plugins.add('gjs-media', (editor, opts = {}) => {
   });
 
   domt.addType('cs-image-masonry', {
-    isComponent: el => (el.hasAttribute && el.hasAttribute('data-mas-bg')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-image-masonry') ? { type: 'cs-image-masonry' } : undefined,
+    isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-mas-bg')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-image-masonry') ? { type: 'cs-image-masonry' } : undefined; },
     model: { defaults: { tagName: 'section', traits: [
       { type: 'color',  name: 'data-mas-bg',     label: 'Background', changeProp: 0 },
       { type: 'select', name: 'data-mas-gap',    label: 'Gap', changeProp: 0,
@@ -69,7 +70,7 @@ grapesjs.plugins.add('gjs-media', (editor, opts = {}) => {
   });
 
   domt.addType('cs-lightbox', {
-    isComponent: el => (el.hasAttribute && el.hasAttribute('data-lb-cols')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-lightbox') ? { type: 'cs-lightbox' } : undefined,
+    isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-lb-cols')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-lightbox') ? { type: 'cs-lightbox' } : undefined; },
     model: { defaults: { tagName: 'section', traits: [
       { type: 'select', name: 'data-lb-cols',   label: 'Columns', changeProp: 0,
         options: [{ id:'2', name:'2 Columns' }, { id:'3', name:'3 Columns' }, { id:'4', name:'4 Columns' }] },
@@ -82,7 +83,7 @@ grapesjs.plugins.add('gjs-media', (editor, opts = {}) => {
   });
 
   domt.addType('cs-audio-player', {
-    isComponent: el => (el.hasAttribute && el.hasAttribute('data-aud-title')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-audio-player') ? { type: 'cs-audio-player' } : undefined,
+    isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-aud-title')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-audio-player') ? { type: 'cs-audio-player' } : undefined; },
     model: { defaults: { tagName: 'div', traits: [
       { type: 'text',  name: 'data-aud-title',  label: 'Track Title', changeProp: 0 },
       { type: 'text',  name: 'data-aud-artist', label: 'Artist Name', changeProp: 0 },
@@ -307,6 +308,21 @@ grapesjs.plugins.add('gjs-media', (editor, opts = {}) => {
     },
   });
 
+  bm.add('icon-grid', {
+    label: 'Icon Grid', category: 'Media', attributes: { class: 'fa fa-th-large' },
+    content: '<section style="padding:80px 20px;background:#fff;font-family:Helvetica,sans-serif;text-align:center;"><div style="max-width:1000px;margin:0 auto;"><h2 style="font-size:2em;font-weight:700;color:#333;margin-bottom:50px;">Why Choose Us</h2><div class="cs-icongrid-grid"><div style="padding:10px;"><div style="font-size:2.2em;margin-bottom:12px;">&#9889;</div><h3 style="font-size:.95em;font-weight:700;color:#333;margin:0 0 8px;">Lightning Fast</h3><p style="font-size:.83em;color:#888;line-height:1.5;margin:0;">Optimized for speed.</p></div><div style="padding:10px;"><div style="font-size:2.2em;margin-bottom:12px;">&#128274;</div><h3 style="font-size:.95em;font-weight:700;color:#333;margin:0 0 8px;">Secure</h3><p style="font-size:.83em;color:#888;line-height:1.5;margin:0;">Enterprise-grade security.</p></div><div style="padding:10px;"><div style="font-size:2.2em;margin-bottom:12px;">&#127757;</div><h3 style="font-size:.95em;font-weight:700;color:#333;margin:0 0 8px;">Global CDN</h3><p style="font-size:.83em;color:#888;line-height:1.5;margin:0;">Delivered worldwide.</p></div><div style="padding:10px;"><div style="font-size:2.2em;margin-bottom:12px;">&#128241;</div><h3 style="font-size:.95em;font-weight:700;color:#333;margin:0 0 8px;">Mobile Ready</h3><p style="font-size:.83em;color:#888;line-height:1.5;margin:0;">Perfect on every screen.</p></div><div style="padding:10px;"><div style="font-size:2.2em;margin-bottom:12px;">&#128200;</div><h3 style="font-size:.95em;font-weight:700;color:#333;margin:0 0 8px;">Analytics</h3><p style="font-size:.83em;color:#888;line-height:1.5;margin:0;">Real-time insights.</p></div><div style="padding:10px;"><div style="font-size:2.2em;margin-bottom:12px;">&#128172;</div><h3 style="font-size:.95em;font-weight:700;color:#333;margin:0 0 8px;">24/7 Support</h3><p style="font-size:.83em;color:#888;line-height:1.5;margin:0;">Always here to help.</p></div></div></div></section><style>.cs-icongrid-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;}@media(max-width:700px){.cs-icongrid-grid{grid-template-columns:repeat(2,1fr);}}</style>'
+  });
+
+  bm.add('carousel-media', {
+    label: 'Carousel Media', category: 'Media', attributes: { class: 'fa fa-play-circle' },
+    content: '<div class="cs-cmed"><div class="cs-cmed-track"><div class="cs-cmed-slide"><div class="cs-cmed-video"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe></div><div class="cs-cmed-caption"><h4>Video Title One</h4><p>Short description of this video or media item.</p></div></div><div class="cs-cmed-slide"><div class="cs-cmed-video"><iframe src="https://www.youtube.com/embed/ScMzIvxBSi4" frameborder="0" allowfullscreen></iframe></div><div class="cs-cmed-caption"><h4>Video Title Two</h4><p>Short description of this video or media item.</p></div></div><div class="cs-cmed-slide"><div class="cs-cmed-video" style="background:#1e1e1e;display:flex;align-items:center;justify-content:center;min-height:200px;"><audio controls style="width:80%;accent-color:#a0449e;"><source src="" type="audio/mpeg"><p style="color:#fff;">Audio not supported.</p></audio></div><div class="cs-cmed-caption"><h4>Audio Track</h4><p>Replace with your audio file source.</p></div></div></div><div class="cs-cmed-controls"><button class="cs-cmed-prev">&#10094; Prev</button><button class="cs-cmed-next">Next &#10095;</button></div></div><style>.cs-cmed{max-width:700px;margin:0 auto;font-family:Helvetica,sans-serif;overflow:hidden;}.cs-cmed-track{display:flex;transition:transform .45s ease;}.cs-cmed-slide{min-width:100%;}.cs-cmed-video{position:relative;padding-bottom:56.25%;height:0;background:#000;}.cs-cmed-video iframe{position:absolute;inset:0;width:100%;height:100%;}.cs-cmed-caption{padding:16px 20px;background:#fafafa;border:1px solid #eee;border-top:none;border-radius:0 0 8px 8px;}.cs-cmed-caption h4{margin:0 0 4px;font-size:.95em;color:#333;font-weight:700;}.cs-cmed-caption p{margin:0;font-size:.82em;color:#888;}.cs-cmed-controls{display:flex;justify-content:center;gap:12px;padding:14px;}.cs-cmed-controls button{padding:8px 22px;background:#4d114f;color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:700;font-size:.88em;}.cs-cmed-controls button:hover{background:#a0449e;}</style>'
+  });
+
+  bm.add('carousel-image', {
+    label: 'Carousel Image', category: 'Media', attributes: { class: 'fa fa-image' },
+    content: '<div class="cs-cimg"><div class="cs-cimg-track"><div class="cs-cimg-slide"><img src="https://via.placeholder.com/1200x500/4d114f/fff?text=Image+1" class="cs-cimg-photo"><div class="cs-cimg-cap">Caption for Image One</div></div><div class="cs-cimg-slide"><img src="https://via.placeholder.com/1200x500/459ba8/fff?text=Image+2" class="cs-cimg-photo"><div class="cs-cimg-cap">Caption for Image Two</div></div><div class="cs-cimg-slide"><img src="https://via.placeholder.com/1200x500/e868a2/fff?text=Image+3" class="cs-cimg-photo"><div class="cs-cimg-cap">Caption for Image Three</div></div></div><button class="cs-cimg-arrow cs-cimg-prev">&#10094;</button><button class="cs-cimg-arrow cs-cimg-next">&#10095;</button><div class="cs-cimg-dots"><span class="cs-cimg-dot cs-cimg-dot-on"></span><span class="cs-cimg-dot"></span><span class="cs-cimg-dot"></span></div></div><style>.cs-cimg{position:relative;overflow:hidden;font-family:Helvetica,sans-serif;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,.12);}.cs-cimg-track{display:flex;transition:transform .5s ease;}.cs-cimg-slide{min-width:100%;position:relative;}.cs-cimg-photo{width:100%;height:400px;object-fit:cover;display:block;}.cs-cimg-cap{position:absolute;bottom:0;left:0;right:0;padding:14px 20px;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:.88em;font-weight:500;}.cs-cimg-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.4);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.1em;cursor:pointer;z-index:5;}.cs-cimg-prev{left:12px;}.cs-cimg-next{right:12px;}.cs-cimg-dots{position:absolute;bottom:48px;left:50%;transform:translateX(-50%);display:flex;gap:8px;}.cs-cimg-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.45);cursor:pointer;}.cs-cimg-dot-on{background:#fff;}</style>'
+  });
+
   // Trait Handlers
   editor.on('component:add', function(model) {
     if (!model || typeof model.getAttributes !== 'function') return;
@@ -314,9 +330,11 @@ grapesjs.plugins.add('gjs-media', (editor, opts = {}) => {
 
     function child(tag) {
       var found = null;
-      model.components && model.components().each(function(c) {
-        if (!found && c.get('tagName') === tag) found = c;
-      });
+      if (model.components) {
+          model.components().each(function(c) {
+            if (!found && c.get('tagName') === tag) found = c;
+          });
+      }
       return found || model;
     }
 
@@ -414,13 +432,15 @@ grapesjs.plugins.add('gjs-media', (editor, opts = {}) => {
         if ('data-gal-radius' in changed) {
           var radius = a['data-gal-radius'] || '6px';
           function setRadius(cm) {
-            cm.components().each(function(c) {
-              var cl = (c.getAttributes ? c.getAttributes().class : '') || '';
-              if (cl.split(' ').indexOf('cs-gal-img') !== -1) {
-                c.addStyle({ 'border-radius': radius });
-              }
-              setRadius(c);
-            });
+            if (cm.components) {
+                cm.components().each(function(c) {
+                  var cl = (c.getAttributes ? c.getAttributes().class : '') || '';
+                  if (cl.split(' ').indexOf('cs-gal-img') !== -1) {
+                    c.addStyle({ 'border-radius': radius });
+                  }
+                  setRadius(c);
+                });
+            }
           }
           setRadius(section);
         }
@@ -441,14 +461,16 @@ grapesjs.plugins.add('gjs-media', (editor, opts = {}) => {
         var wrap = el.querySelector('div[style*="display:flex;gap"]');
         if ('data-mas-gap' in changed && wrap) {
           wrap.style.gap = a['data-mas-gap'] || '12px';
-          wrap.querySelectorAll('div[style*="flex-direction:column"]').forEach(function(col) {
-            col.style.gap = a['data-mas-gap'] || '12px';
-          });
+          var cols = wrap.querySelectorAll('div[style*="flex-direction:column"]');
+          for (var i = 0; i < cols.length; i++) {
+              cols[i].style.gap = a['data-mas-gap'] || '12px';
+          }
         }
         if ('data-mas-radius' in changed) {
-          el.querySelectorAll('div[style*="background:url"]').forEach(function(d) {
-            d.style.borderRadius = a['data-mas-radius'] || '6px';
-          });
+          var boxes = el.querySelectorAll('div[style*="background:url"]');
+          for (var j = 0; j < boxes.length; j++) {
+              boxes[j].style.borderRadius = a['data-mas-radius'] || '6px';
+          }
         }
       });
     }
@@ -473,13 +495,15 @@ grapesjs.plugins.add('gjs-media', (editor, opts = {}) => {
         if ('data-lb-radius' in changed) {
           var radius = a['data-lb-radius'] || '8px';
           function setRadius(cm) {
-            cm.components().each(function(c) {
-              var cl = (c.getAttributes ? c.getAttributes().class : '') || '';
-              if (cl.split(' ').indexOf('cs-lb-img') !== -1) {
-                c.addStyle({ 'border-radius': radius });
-              }
-              setRadius(c);
-            });
+            if (cm.components) {
+                cm.components().each(function(c) {
+                  var cl = (c.getAttributes ? c.getAttributes().class : '') || '';
+                  if (cl.split(' ').indexOf('cs-lb-img') !== -1) {
+                    c.addStyle({ 'border-radius': radius });
+                  }
+                  setRadius(c);
+                });
+            }
           }
           setRadius(section);
         }
@@ -521,7 +545,7 @@ grapesjs.plugins.add('gjs-media', (editor, opts = {}) => {
         var changed = (m.changed && m.changed.attributes) || {};
         var a = model.getAttributes();
         var iframe = null;
-        function findIframe(cm) { cm.components && cm.components().each(function(c) { if (c.get('tagName') === 'iframe') { iframe = c; } else findIframe(c); }); }
+        function findIframe(cm) { if (cm.components) cm.components().each(function(c) { if (c.get('tagName') === 'iframe') { iframe = c; } else findIframe(c); }); }
         findIframe(model);
         if (!iframe) return;
         if ('data-vid-url' in changed || 'data-vid-autoplay' in changed || 'data-vid-loop' in changed) {

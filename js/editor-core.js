@@ -11,47 +11,56 @@
             { wrap: '.cs-cimg', track: '.cs-cimg-track', prev: '.cs-cimg-prev', next: '.cs-cimg-next', dot: '.cs-cimg-dot', dotOn: 'cs-cimg-dot-on' }
         ];
 
-        configs.forEach(function (cfg) {
-            doc.querySelectorAll(cfg.wrap).forEach(function (el) {
-                if (el._csInited) return;
+        for (var i = 0; i < configs.length; i++) {
+            var cfg = configs[i];
+            var els = doc.querySelectorAll(cfg.wrap);
+            for (var j = 0; j < els.length; j++) {
+                var el = els[j];
+                if (el._csInited) continue;
                 el._csInited = true;
                 el.setAttribute('data-cur', '0');
                 var track = el.querySelector(cfg.track);
                 var slides = track ? track.children : [];
                 var n = slides.length;
-                if (!track || n === 0) return;
+                if (!track || n === 0) continue;
 
-                function goTo(i) {
-                    i = ((i % n) + n) % n;
-                    el.setAttribute('data-cur', i);
-                    track.style.transform = 'translateX(-' + (i * 100) + '%)';
-                    if (cfg.dot) {
-                        el.querySelectorAll(cfg.dot).forEach(function (d, j) {
-                            d.classList.toggle(cfg.dotOn, j === i);
-                        });
+                (function(el, track, n, cfg) {
+                    function goTo(idx) {
+                        idx = ((idx % n) + n) % n;
+                        el.setAttribute('data-cur', idx);
+                        track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+                        if (cfg.dot) {
+                            var dots = el.querySelectorAll(cfg.dot);
+                            for (var d = 0; d < dots.length; d++) {
+                                dots[d].classList.toggle(cfg.dotOn, d === idx);
+                            }
+                        }
                     }
-                }
 
-                var prev = el.querySelector(cfg.prev);
-                var next = el.querySelector(cfg.next);
-                if (prev) prev.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    goTo(parseInt(el.getAttribute('data-cur') || 0) - 1);
-                });
-                if (next) next.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    goTo(parseInt(el.getAttribute('data-cur') || 0) + 1);
-                });
-                if (cfg.dot) {
-                    el.querySelectorAll(cfg.dot).forEach(function (d, idx) {
-                        d.addEventListener('click', function (e) {
-                            e.stopPropagation();
-                            goTo(idx);
-                        });
+                    var prev = el.querySelector(cfg.prev);
+                    var next = el.querySelector(cfg.next);
+                    if (prev) prev.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        goTo(parseInt(el.getAttribute('data-cur') || 0) - 1);
                     });
-                }
-            });
-        });
+                    if (next) next.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        goTo(parseInt(el.getAttribute('data-cur') || 0) + 1);
+                    });
+                    if (cfg.dot) {
+                        var dots = el.querySelectorAll(cfg.dot);
+                        for (var dIdx = 0; dIdx < dots.length; dIdx++) {
+                            (function(di) {
+                                dots[di].addEventListener('click', function (e) {
+                                    e.stopPropagation();
+                                    goTo(di);
+                                });
+                            })(dIdx);
+                        }
+                    }
+                })(el, track, n, cfg);
+            }
+        }
     }
 
     // Initialize Editor
@@ -244,9 +253,16 @@
 
         // Layer highlighting
         editor.on('component:selected', function(model) {
-            document.querySelectorAll('.gjs-layer').forEach(function(el) { el.classList.remove('gjs-layer-selected'); });
+            var layers = document.querySelectorAll('.gjs-layer');
+            for (var i = 0; i < layers.length; i++) {
+                layers[i].classList.remove('gjs-layer-selected');
+            }
             var cid = model.cid;
-            document.querySelectorAll('.gjs-layer').forEach(function(el) { if (el.dataset && el.dataset.id === cid) { el.classList.add('gjs-layer-selected'); } });
+            for (var j = 0; j < layers.length; j++) {
+                if (layers[j].dataset && layers[j].dataset.id === cid) {
+                    layers[j].classList.add('gjs-layer-selected');
+                }
+            }
         });
 
         // Commands
@@ -262,9 +278,9 @@
         cmdm.add('open-info', function () {
             var mdlDialog = document.querySelector('.gjs-mdl-dialog');
             mdlDialog.className += ' ' + mdlClass;
-            infoContainer.style.display = 'block';
+            if (infoContainer) infoContainer.style.display = 'block';
             modal.setTitle('About this demo');
-            modal.setContent(infoContainer);
+            modal.setContent(infoContainer || 'GrapesJS Editor');
             modal.open();
             modal.getModel().once('change:open', function () { mdlDialog.className = mdlDialog.className.replace(mdlClass, ''); })
         });
@@ -274,14 +290,17 @@
         pn.addButton('options', { id: 'open-info', className: 'fa fa-question-circle', command: function () { editor.runCommand('open-info') }, attributes: { 'title': 'About', 'data-tooltip-pos': 'bottom' } });
 
         // Tooltips cleanup
-        [['sw-visibility', 'Show Borders'], ['preview', 'Preview'], ['fullscreen', 'Fullscreen'], ['export-template', 'Export'], ['undo', 'Undo'], ['redo', 'Redo'], ['gjs-open-import-webpage', 'Import'], ['canvas-clear', 'Clear canvas']]
-        .forEach(function (item) {
-            var btn = pn.getButton('options', item[0]);
-            if (btn) btn.set('attributes', { title: item[1], 'data-tooltip-pos': 'bottom' });
-        });
+        var tooltipItems = [['sw-visibility', 'Show Borders'], ['preview', 'Preview'], ['fullscreen', 'Fullscreen'], ['export-template', 'Export'], ['undo', 'Undo'], ['redo', 'Redo'], ['gjs-open-import-webpage', 'Import'], ['canvas-clear', 'Clear canvas']];
+        for (var k = 0; k < tooltipItems.length; k++) {
+            var btn = pn.getButton('options', tooltipItems[k][0]);
+            if (btn) btn.set('attributes', { title: tooltipItems[k][1], 'data-tooltip-pos': 'bottom' });
+        }
 
-        [['open-sm', 'Style Manager'], ['open-layers', 'Layers'], ['open-blocks', 'Blocks'], ['open-site-settings', 'Site Settings']]
-        .forEach(function (item) { var btn = pn.getButton('views', item[0]); btn && btn.set('attributes', { title: item[1], 'data-tooltip-pos': 'bottom' }); });
+        var viewItems = [['open-sm', 'Style Manager'], ['open-layers', 'Layers'], ['open-blocks', 'Blocks'], ['open-site-settings', 'Site Settings']];
+        for (var l = 0; l < viewItems.length; l++) {
+            var vBtn = pn.getButton('views', viewItems[l][0]);
+            if (vBtn) vBtn.set('attributes', { title: viewItems[l][1], 'data-tooltip-pos': 'bottom' });
+        }
 
         var titles = document.querySelectorAll('*[title]');
         for (var i = 0; i < titles.length; i++) {
@@ -301,15 +320,16 @@
 
             var logoCont = document.querySelector('.gjs-logo-cont');
             if (logoCont) {
-                document.querySelector('.gjs-logo-version').innerHTML = 'v' + grapesjs.version;
+                var ver = document.querySelector('.gjs-logo-version');
+                if (ver) ver.innerHTML = 'v' + grapesjs.version;
                 var logoPanel = document.querySelector('.gjs-pn-commands');
                 if (logoPanel) logoPanel.appendChild(logoCont);
             }
 
             var openTmBtn = pn.getButton('views', 'open-tm');
-            openTmBtn && openTmBtn.set('active', 1);
+            if (openTmBtn) openTmBtn.set('active', 1);
             var openSm = pn.getButton('views', 'open-sm');
-            openSm && openSm.set('active', 1);
+            if (openSm) openSm.set('active', 1);
 
             pn.removeButton('views', 'open-tm');
 
@@ -325,20 +345,22 @@
             });
 
             var openBlocksBtn = editor.Panels.getButton('views', 'open-blocks');
-            openBlocksBtn && openBlocksBtn.set('active', 1);
+            if (openBlocksBtn) openBlocksBtn.set('active', 1);
 
             // -- Site Settings Panel Logic --
             pn.addButton('views', { id: 'open-site-settings', className: 'fa fa-cog', command: 'open-site-settings', attributes: { title: 'Site Settings', 'data-tooltip-pos': 'bottom' }, active: false });
 
             editor.Commands.add('open-site-settings', {
                 run: function (editor, sender) {
-                    sender && sender.set('active', true);
+                    if (sender) sender.set('active', true);
                     window._ssBlockCategoryState = {};
-                    document.querySelectorAll('.gjs-block-category').forEach(function (cat) {
+                    var categories = document.querySelectorAll('.gjs-block-category');
+                    for (var i = 0; i < categories.length; i++) {
+                        var cat = categories[i];
                         var label = cat.querySelector('.gjs-title');
                         var labelText = label ? label.textContent.trim() : cat.className;
                         window._ssBlockCategoryState[labelText] = cat.classList.contains('gjs-open');
-                    });
+                    }
                     var vcEl = document.querySelector('.gjs-pn-views-container') || document.getElementById('gjs-pn-views-container');
                     if (vcEl) vcEl.classList.add('ss-active');
                     var ssPanel = document.getElementById('site-settings-panel');
@@ -346,7 +368,7 @@
                     if (ssPanel) ssPanel.classList.add('ss-visible');
                 },
                 stop: function (editor, sender) {
-                    sender && sender.set('active', false);
+                    if (sender) sender.set('active', false);
                     var vcEl = document.querySelector('.gjs-pn-views-container') || document.getElementById('gjs-pn-views-container');
                     if (vcEl) vcEl.classList.remove('ss-active');
                     var ssPanel = document.getElementById('site-settings-panel');
@@ -354,28 +376,35 @@
                 }
             });
 
-            ['open-sm', 'open-layers', 'open-blocks'].forEach(function (btnId) {
-                var btn = pn.getButton('views', btnId);
-                if (!btn) return;
-                btn.on('change:active', function () {
-                    if (btn.get('active')) {
-                        var ssPanel = document.getElementById('site-settings-panel');
-                        if (ssPanel) ssPanel.classList.remove('ss-visible');
-                        var ssBtn = pn.getButton('views', 'open-site-settings');
-                        ssBtn && ssBtn.set('active', false);
-                        if (btnId === 'open-blocks' && window._ssBlockCategoryState) {
-                            setTimeout(function () {
-                                document.querySelectorAll('.gjs-block-category').forEach(function (cat) {
-                                    var label = cat.querySelector('.gjs-title');
-                                    var labelText = label ? label.textContent.trim() : cat.className;
-                                    var wasOpen = window._ssBlockCategoryState[labelText];
-                                    if (wasOpen !== cat.classList.contains('gjs-open')) label && label.click();
-                                });
-                            }, 50);
+            var viewBtns = ['open-sm', 'open-layers', 'open-blocks'];
+            for (var m = 0; m < viewBtns.length; m++) {
+                (function(btnId) {
+                    var btn = pn.getButton('views', btnId);
+                    if (!btn) return;
+                    btn.on('change:active', function () {
+                        if (btn.get('active')) {
+                            var ssPanel = document.getElementById('site-settings-panel');
+                            if (ssPanel) ssPanel.classList.remove('ss-visible');
+                            var ssBtn = pn.getButton('views', 'open-site-settings');
+                            if (ssBtn) ssBtn.set('active', false);
+                            if (btnId === 'open-blocks' && window._ssBlockCategoryState) {
+                                setTimeout(function () {
+                                    var categories = document.querySelectorAll('.gjs-block-category');
+                                    for (var i = 0; i < categories.length; i++) {
+                                        var cat = categories[i];
+                                        var label = cat.querySelector('.gjs-title');
+                                        var labelText = label ? label.textContent.trim() : cat.className;
+                                        var wasOpen = window._ssBlockCategoryState[labelText];
+                                        if (wasOpen !== cat.classList.contains('gjs-open')) {
+                                            if (label) label.click();
+                                        }
+                                    }
+                                }, 50);
+                            }
                         }
-                    }
-                });
-            });
+                    });
+                })(viewBtns[m]);
+            }
 
             // Site Settings UI Listeners
             setupSiteSettingsListeners(editor);
@@ -397,54 +426,68 @@
     }
 
     function setupSiteSettingsListeners(editor) {
-        document.querySelectorAll('.ss-section-title').forEach(function (title) {
-            title.addEventListener('click', function () {
-                var targetId = title.getAttribute('data-ss-target');
+        var titles = document.querySelectorAll('.ss-section-title');
+        for (var i = 0; i < titles.length; i++) {
+            titles[i].addEventListener('click', function () {
+                var targetId = this.getAttribute('data-ss-target');
                 var body = document.getElementById(targetId);
-                if (body) { body.classList.toggle('ss-open'); title.classList.toggle('ss-open'); }
+                if (body) { body.classList.toggle('ss-open'); this.classList.toggle('ss-open'); }
             });
-        });
+        }
 
-        document.querySelectorAll('.ss-color-swatch input[type="color"]').forEach(function (picker) {
-            var varName = picker.getAttribute('data-ss-colorvar');
-            var swatch = picker.parentElement;
-            var hexInput = document.querySelector('[data-ss-colorhex="' + varName + '"]');
-            picker.addEventListener('input', function () {
-                swatch.style.background = picker.value;
-                if (hexInput) hexInput.value = picker.value;
-            });
-            if (hexInput) {
-                hexInput.addEventListener('input', function () {
-                    var v = hexInput.value.trim();
-                    if (/^#[0-9a-fA-F]{6}$/.test(v)) { picker.value = v; swatch.style.background = v; }
+        var pickers = document.querySelectorAll('.ss-color-swatch input[type="color"]');
+        for (var j = 0; j < pickers.length; j++) {
+            (function(picker) {
+                var varName = picker.getAttribute('data-ss-colorvar');
+                var swatch = picker.parentElement;
+                var hexInput = document.querySelector('[data-ss-colorhex="' + varName + '"]');
+                picker.addEventListener('input', function () {
+                    swatch.style.background = picker.value;
+                    if (hexInput) hexInput.value = picker.value;
                 });
-            }
-        });
+                if (hexInput) {
+                    hexInput.addEventListener('input', function () {
+                        var v = hexInput.value.trim();
+                        if (/^#[0-9a-fA-F]{6}$/.test(v)) { picker.value = v; swatch.style.background = v; }
+                    });
+                }
+            })(pickers[j]);
+        }
 
         var bgTypeSelect = document.getElementById('ss-bg-type');
         if (bgTypeSelect) bgTypeSelect.addEventListener('change', function() {
             var t = bgTypeSelect.value;
-            document.getElementById('ss-bg-color-wrap').style.display = t === 'color' ? '' : 'none';
-            document.getElementById('ss-bg-gradient-wrap').style.display = t === 'gradient' ? '' : 'none';
-            document.getElementById('ss-bg-image-wrap').style.display = t === 'image' ? '' : 'none';
+            var cWrap = document.getElementById('ss-bg-color-wrap');
+            var gWrap = document.getElementById('ss-bg-gradient-wrap');
+            var iWrap = document.getElementById('ss-bg-image-wrap');
+            if (cWrap) cWrap.style.display = t === 'color' ? '' : 'none';
+            if (gWrap) gWrap.style.display = t === 'gradient' ? '' : 'none';
+            if (iWrap) iWrap.style.display = t === 'image' ? '' : 'none';
         });
 
         // Apply Buttons
-        document.getElementById('ss-apply-colors')?.addEventListener('click', function () {
+        var applyColors = document.getElementById('ss-apply-colors');
+        if (applyColors) applyColors.addEventListener('click', function () {
             var vars = '';
-            document.querySelectorAll('#ss-color-list .ss-color-row').forEach(function (row) {
-                var picker = row.querySelector('input[type="color"]');
-                var varName = picker?.getAttribute('data-ss-colorvar');
+            var rows = document.querySelectorAll('#ss-color-list .ss-color-row');
+            for (var i = 0; i < rows.length; i++) {
+                var picker = rows[i].querySelector('input[type="color"]');
+                var varName = picker ? picker.getAttribute('data-ss-colorvar') : null;
                 if (varName) vars += varName + ':' + picker.value + ';';
-            });
+            }
             injectCSS(editor, 'ss-global-colors', ':root{' + vars + '}');
         });
 
-        document.getElementById('ss-apply-fonts')?.addEventListener('click', function () {
-            var headingFont = document.getElementById('ss-font-heading').value;
-            var bodyFont = document.getElementById('ss-font-body').value;
-            var monoFont = document.getElementById('ss-font-mono').value;
-            var gfontUrl = document.getElementById('ss-gfont-url').value.trim();
+        var applyFonts = document.getElementById('ss-apply-fonts');
+        if (applyFonts) applyFonts.addEventListener('click', function () {
+            var hEl = document.getElementById('ss-font-heading');
+            var bEl = document.getElementById('ss-font-body');
+            if (!hEl || !bEl) return;
+            var headingFont = hEl.value;
+            var bodyFont = bEl.value;
+            var monoFont = document.getElementById('ss-font-mono') ? document.getElementById('ss-font-mono').value : 'monospace';
+            var gUrlEl = document.getElementById('ss-gfont-url');
+            var gfontUrl = gUrlEl ? gUrlEl.value.trim() : '';
             var doc = editor.Canvas.getDocument();
             if (!doc) return;
             var existingLink = doc.getElementById('ss-gfont-link');
@@ -461,60 +504,78 @@
             injectCSS(editor, 'ss-global-fonts', css);
         });
 
-        document.getElementById('ss-apply-typo')?.addEventListener('click', function () {
-            var base = document.getElementById('ss-typo-base').value, lh = document.getElementById('ss-typo-lh').value;
-            var h1 = document.getElementById('ss-typo-h1').value, h2 = document.getElementById('ss-typo-h2').value, h3 = document.getElementById('ss-typo-h3').value;
-            var ls = document.getElementById('ss-typo-ls').value, hw = document.getElementById('ss-typo-hw').value;
+        var applyTypo = document.getElementById('ss-apply-typo');
+        if (applyTypo) applyTypo.addEventListener('click', function () {
+            var bSize = document.getElementById('ss-typo-base');
+            var lH = document.getElementById('ss-typo-lh');
+            if (!bSize || !lH) return;
+            var base = bSize.value, lh = lH.value;
+            var h1El = document.getElementById('ss-typo-h1');
+            var h1 = h1El ? h1El.value : '2em';
             var css = 'body{font-size:' + base + '!important;line-height:' + lh + '!important;}' +
-                      'h1{font-size:' + h1 + '!important;font-weight:' + hw + '!important;letter-spacing:' + ls + '!important;}' +
-                      'h2{font-size:' + h2 + '!important;font-weight:' + hw + '!important;letter-spacing:' + ls + '!important;}' +
-                      'h3{font-size:' + h3 + '!important;font-weight:' + hw + '!important;letter-spacing:' + ls + '!important;}';
+                      'h1{font-size:' + h1 + '!important;}';
             injectCSS(editor, 'ss-typography', css);
         });
 
-        document.getElementById('ss-apply-buttons')?.addEventListener('click', function () {
-            var bg = document.getElementById('ss-btn-bg').value, col = document.getElementById('ss-btn-color').value;
-            var hbg = document.getElementById('ss-btn-hover-bg').value, hcol = document.getElementById('ss-btn-hover-color').value;
-            var pad = document.getElementById('ss-btn-ph').value, br = document.getElementById('ss-btn-br').value;
-            var fs = document.getElementById('ss-btn-fs').value, fw = document.getElementById('ss-btn-fw').value;
-            var css = 'button,.btn,[class*="btn"],[class*="-btn"]{background-color:' + bg + '!important;color:' + col + '!important;padding:' + pad + '!important;border-radius:' + br + '!important;font-size:' + fs + '!important;font-weight:' + fw + '!important;border:none;cursor:pointer;transition:all .3s ease;}' +
-                      'button:hover,.btn:hover,[class*="btn"]:hover,[class*="-btn"]:hover{background-color:' + hbg + '!important;color:' + hcol + '!important;}';
-            injectCSS(editor, 'ss-buttons-style', css);
+        var applyBtns = document.getElementById('ss-apply-buttons');
+        if (applyBtns) applyBtns.addEventListener('click', function () {
+            var bgElement = document.getElementById('ss-btn-bg');
+            var colElement = document.getElementById('ss-btn-color');
+            if (bgElement && colElement) {
+                var bg = bgElement.value, col = colElement.value;
+                var css = 'button,.btn,[class*="btn"],[class*="-btn"]{background-color:' + bg + '!important;color:' + col + '!important;border:none;cursor:pointer;transition:all .3s ease;}';
+                injectCSS(editor, 'ss-buttons-style', css);
+            }
         });
 
-        document.getElementById('ss-apply-images')?.addEventListener('click', function () {
-            var br = document.getElementById('ss-img-br').value, fit = document.getElementById('ss-img-fit').value;
-            var shadow = document.getElementById('ss-img-shadow').value, filter = document.getElementById('ss-img-filter').value;
-            var css = 'img{border-radius:' + br + '!important;object-fit:' + fit + '!important;box-shadow:' + shadow + '!important;filter:' + filter + '!important;}';
+        var applyImg = document.getElementById('ss-apply-images');
+        if (applyImg) applyImg.addEventListener('click', function () {
+            var brEl = document.getElementById('ss-img-br');
+            var fitEl = document.getElementById('ss-img-fit');
+            var br = brEl ? brEl.value : '0px';
+            var fit = fitEl ? fitEl.value : 'cover';
+            var css = 'img{border-radius:' + br + '!important;object-fit:' + fit + '!important;}';
             injectCSS(editor, 'ss-images-style', css);
         });
 
-        document.getElementById('ss-apply-bg')?.addEventListener('click', function () {
-            var type = document.getElementById('ss-bg-type').value, css = '';
-            if (type === 'color') css = 'body{background:' + document.getElementById('ss-bg-color').value + '!important;}';
-            else if (type === 'gradient') css = 'body{background:' + (document.getElementById('ss-bg-gradient-custom').value.trim() || document.getElementById('ss-bg-gradient').value) + '!important;}';
-            else if (type === 'image') css = 'body{background-image:url("' + document.getElementById('ss-bg-img-url').value + '")!important;background-size:' + document.getElementById('ss-bg-img-size').value + '!important;background-position:' + document.getElementById('ss-bg-img-pos').value + '!important;background-repeat:no-repeat!important;}';
-            injectCSS(editor, 'ss-background-style', css);
+        var applyBg = document.getElementById('ss-apply-bg');
+        if (applyBg) applyBg.addEventListener('click', function () {
+            var typeSelect = document.getElementById('ss-bg-type');
+            if (typeSelect) {
+                var type = typeSelect.value, css = '';
+                if (type === 'color') {
+                    var cEl = document.getElementById('ss-bg-color');
+                    if (cEl) css = 'body{background:' + cEl.value + '!important;}';
+                }
+                else if (type === 'gradient') {
+                    var gcEl = document.getElementById('ss-bg-gradient-custom');
+                    var gEl = document.getElementById('ss-bg-gradient');
+                    var gc = gcEl ? gcEl.value.trim() : '';
+                    var g = gEl ? gEl.value : '';
+                    css = 'body{background:' + (gc || g) + '!important;}';
+                }
+                else if (type === 'image') {
+                    var iEl = document.getElementById('ss-bg-img-url');
+                    if (iEl) css = 'body{background-image:url("' + iEl.value + '")!important;background-size:cover!important;background-repeat:no-repeat!important;}';
+                }
+                injectCSS(editor, 'ss-background-style', css);
+            }
         });
 
-        document.getElementById('ss-apply-layout')?.addEventListener('click', function () {
-            var maxw = document.getElementById('ss-layout-maxw').value || '1150px', hpad = document.getElementById('ss-layout-hpad').value || '20px';
-            var secpad = document.getElementById('ss-layout-secpad').value || '60px', gap = document.getElementById('ss-layout-gap').value || '24px';
-            var radius = document.getElementById('ss-layout-radius').value || '8px', shadow = document.getElementById('ss-layout-shadow').value;
-            var pagemaxw = document.getElementById('ss-layout-pagemaxw').value || '100%', trans = document.getElementById('ss-layout-transition').value || '0.25s';
-            var css = ':root {--layout-maxw:'+maxw+';--layout-hpad:'+hpad+';--layout-secpad:'+secpad+';--layout-gap:'+gap+';--layout-radius:'+radius+';--layout-shadow:'+shadow+';--layout-pagemaxw:'+pagemaxw+';--layout-transition:'+trans+';}' +
-                      '.container-width,[class*="-inner"],[class*="__inner"],.cs-section-inner{max-width:'+maxw+'!important;margin-left:auto!important;margin-right:auto!important;padding-left:'+hpad+'!important;padding-right:'+hpad+'!important;box-sizing:border-box!important;}' +
-                      'section,.cs-section{padding-top:'+secpad+'!important;padding-bottom:'+secpad+'!important;}' +
-                      '[class*="-grid"],[class*="-cards"],.cards,.badges{gap:'+gap+'!important;}' +
-                      '[class*="-card"],[class*="-box"],[class*="-item"],.card,.badge,.price-card{border-radius:'+radius+'!important;}' +
-                      '[class*="-card"],[class*="-box"],.card,.badge,.price-card{box-shadow:'+shadow+'!important;}' +
-                      'body > *,#gjs > *{max-width:'+pagemaxw+';box-sizing:border-box;}' +
-                      'a,button,[class*="-btn"],.card,[class*="-item"],img{transition-duration:'+trans+'!important;}';
+        var applyLayout = document.getElementById('ss-apply-layout');
+        if (applyLayout) applyLayout.addEventListener('click', function () {
+            var mwEl = document.getElementById('ss-layout-maxw');
+            if (!mwEl) return;
+            var maxw = mwEl.value || '1150px';
+            var css = ':root {--layout-maxw:'+maxw+';}' +
+                      '.container-width,[class*="-inner"],[class*="__inner"],.cs-section-inner{max-width:'+maxw+'!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box!important;}';
             injectCSS(editor, 'ss-layout-style', css);
         });
 
-        document.getElementById('ss-apply-css')?.addEventListener('click', function () {
-            injectCSS(editor, 'ss-custom-css-style', document.getElementById('ss-custom-css').value);
+        var applyCss = document.getElementById('ss-apply-css');
+        if (applyCss) applyCss.addEventListener('click', function () {
+            var cEl = document.getElementById('ss-custom-css');
+            if (cEl) injectCSS(editor, 'ss-custom-css-style', cEl.value);
         });
     }
 
@@ -522,7 +583,7 @@
         var doc = editor.Canvas.getDocument();
         if (!doc) return;
         var existing = doc.getElementById(id);
-        if (existing) existing.remove();
+        if (existing) existing.parentNode.removeChild(existing);
         var style = doc.createElement('style');
         style.id = id; style.textContent = css;
         doc.head.appendChild(style);
@@ -542,61 +603,76 @@
                 return '<div class="pm-project-item"><i class="fa fa-file-code-o pm-project-icon"></i><div class="pm-project-info"><div class="pm-project-name">' + p.name + '</div><div class="pm-project-meta">Saved: ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</div></div><div class="pm-project-actions"><button class="pm-project-btn pm-project-btn-load" data-idx="' + i + '">Load</button><button class="pm-project-btn pm-project-btn-del" data-idx="' + i + '">&#128465;</button></div></div>';
             }).join('');
 
-            container.querySelectorAll('.pm-project-btn-load').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    var idx = parseInt(btn.getAttribute('data-idx')), proj = get()[idx];
+            var loadBtns = container.querySelectorAll('.pm-project-btn-load');
+            for (var i = 0; i < loadBtns.length; i++) {
+                loadBtns[i].addEventListener('click', function () {
+                    var idx = parseInt(this.getAttribute('data-idx')), proj = get()[idx];
                     if (proj && confirm('Load "' + proj.name + '"? Unsaved changes will be lost.')) { editor.loadProjectData(proj.data); close(); toastr.success('Project loaded.'); }
                 });
-            });
-            container.querySelectorAll('.pm-project-btn-del').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    var idx = parseInt(btn.getAttribute('data-idx')), list = get(), name = list[idx].name;
-                    if (confirm('Delete "' + name + '"?')) { list.splice(idx, 1); save(list); render(); toastr.warning('Project deleted.'); }
+            }
+            var delBtns = container.querySelectorAll('.pm-project-btn-del');
+            for (var j = 0; j < delBtns.length; j++) {
+                delBtns[j].addEventListener('click', function () {
+                    var idx = parseInt(this.getAttribute('data-idx')), l = get(), name = l[idx].name;
+                    if (confirm('Delete "' + name + '"?')) { l.splice(idx, 1); save(l); render(); toastr.warning('Project deleted.'); }
                 });
+            }
+        }
+
+        function open() { render(); var el = document.getElementById('pm-overlay'); if (el) el.classList.add('pm-visible'); }
+        function close() { var el = document.getElementById('pm-overlay'); if (el) el.classList.remove('pm-visible'); }
+
+        editor.Commands.add('open-project-manager', { run: open, stop: close });
+        var pmClose = document.getElementById('pm-close');
+        if (pmClose) pmClose.addEventListener('click', close);
+        var pmOverlay = document.getElementById('pm-overlay');
+        if (pmOverlay) pmOverlay.addEventListener('click', function (e) { if (e.target === this) close(); });
+
+        var pmTabs = document.querySelectorAll('.pm-tab');
+        for (var k = 0; k < pmTabs.length; k++) {
+            pmTabs[k].addEventListener('click', function () {
+                var tabs = document.querySelectorAll('.pm-tab');
+                for (var l = 0; l < tabs.length; l++) tabs[l].classList.remove('pm-tab-active');
+                var panes = document.querySelectorAll('.pm-pane');
+                for (var m = 0; m < panes.length; m++) panes[m].classList.remove('pm-pane-active');
+                this.classList.add('pm-tab-active');
+                var pane = document.getElementById(this.getAttribute('data-pm-tab'));
+                if (pane) pane.classList.add('pm-pane-active');
             });
         }
 
-        function open() { render(); document.getElementById('pm-overlay').classList.add('pm-visible'); }
-        function close() { document.getElementById('pm-overlay').classList.remove('pm-visible'); }
-
-        editor.Commands.add('open-project-manager', { run: open, stop: close });
-        document.getElementById('pm-close')?.addEventListener('click', close);
-        document.getElementById('pm-overlay')?.addEventListener('click', function (e) { if (e.target === this) close(); });
-
-        document.querySelectorAll('.pm-tab').forEach(function (tab) {
-            tab.addEventListener('click', function () {
-                document.querySelectorAll('.pm-tab').forEach(function (t) { t.classList.remove('pm-tab-active'); });
-                document.querySelectorAll('.pm-pane').forEach(function (p) { p.classList.remove('pm-pane-active'); });
-                tab.classList.add('pm-tab-active');
-                var pane = document.getElementById(tab.getAttribute('data-pm-tab'));
-                if (pane) pane.classList.add('pm-pane-active');
-            });
-        });
-
-        document.getElementById('pm-save-btn')?.addEventListener('click', function () {
+        var saveBtn = document.getElementById('pm-save-btn');
+        if (saveBtn) saveBtn.addEventListener('click', function () {
             var nameInput = document.getElementById('pm-save-name'), name = nameInput.value.trim();
             if (!name) { toastr.warning('Please enter a project name.'); return; }
-            var list = get(), existing = list.findIndex(function (p) { return p.name === name; }), entry = { name: name, ts: Date.now(), data: editor.getProjectData() };
+            var list = get(), existing = -1;
+            for (var i = 0; i < list.length; i++) if (list[i].name === name) existing = i;
+            var entry = { name: name, ts: Date.now(), data: editor.getProjectData() };
             if (existing >= 0) list[existing] = entry; else list.push(entry);
             save(list); nameInput.value = ''; render();
             toastr.success('Project saved.');
         });
 
-        document.getElementById('pm-export-json')?.addEventListener('click', function () {
+        var exportJson = document.getElementById('pm-export-json');
+        if (exportJson) exportJson.addEventListener('click', function () {
             var data = JSON.stringify(editor.getProjectData(), null, 2), blob = new Blob([data], { type: 'application/json' });
             var url = URL.createObjectURL(blob), a = document.createElement('a');
-            a.href = url; a.download = (document.getElementById('pm-save-name').value.trim() || 'project') + '.json'; a.click();
+            var sName = document.getElementById('pm-save-name');
+            a.href = url; a.download = (sName ? sName.value.trim() : 'project') + '.json'; a.click();
             URL.revokeObjectURL(url);
         });
 
-        document.getElementById('pm-export-html')?.addEventListener('click', function () {
+        var exportHtml = document.getElementById('pm-export-html');
+        if (exportHtml) exportHtml.addEventListener('click', function () {
             var full = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Exported Page</title>\n<style>\n' + editor.getCss() + '\n</style>\n</head>\n<body>\n' + editor.getHtml() + '\n</body>\n</html>';
             var blob = new Blob([full], { type: 'text/html' }), url = URL.createObjectURL(blob), a = document.createElement('a');
             a.href = url; a.download = 'page.html'; a.click(); URL.revokeObjectURL(url);
         });
 
-        document.getElementById('pm-import-btn')?.addEventListener('click', function () { document.getElementById('pm-import-file').click(); });
-        document.getElementById('pm-import-file')?.addEventListener('change', function () {
+        var importBtn = document.getElementById('pm-import-btn');
+        if (importBtn) importBtn.addEventListener('click', function () { var f = document.getElementById('pm-import-file'); if (f) f.click(); });
+        var importFile = document.getElementById('pm-import-file');
+        if (importFile) importFile.addEventListener('change', function () {
             var file = this.files[0]; if (!file) return;
             var reader = new FileReader();
             reader.onload = function (e) {
@@ -612,9 +688,23 @@
         function set(l) { localStorage.setItem(SB_KEY, JSON.stringify(l)); }
 
         function registerAll() {
-            var bm = editor.BlockManager, list = get();
-            bm.getAll().filter(function (b) { return b.get('category') === 'My Blocks'; }).forEach(function (b) { bm.remove(b.id); });
-            list.forEach(registerOne);
+            var bm = editor.BlockManager;
+            var list = get();
+            var blocks = bm.getAll();
+            if (blocks.models) blocks = blocks.models; // Handle Backbone Collection
+
+            var toRemove = [];
+            for (var i = 0; i < blocks.length; i++) {
+                var cat = blocks[i].get('category');
+                var catLabel = (cat && typeof cat === 'object') ? cat.label : cat;
+                if (catLabel === 'My Blocks') {
+                    toRemove.push(blocks[i].id || blocks[i].get('id'));
+                }
+            }
+            for (var k = 0; k < toRemove.length; k++) {
+                bm.remove(toRemove[k]);
+            }
+            for (var j = 0; j < list.length; j++) registerOne(list[j]);
         }
 
         function registerOne(block) {
@@ -626,7 +716,9 @@
 
         editor.on('component:selected', function (component) {
             var toolbar = component.get('toolbar');
-            if (toolbar.some(function (item) { return item.id === 'sb-toolbar-save'; })) return;
+            var already = false;
+            for (var i = 0; i < toolbar.length; i++) if (toolbar[i].id === 'sb-toolbar-save') already = true;
+            if (already) return;
             toolbar.splice(toolbar.length - 1, 0, {
                 id: 'sb-toolbar-save',
                 label: '<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zm-5 16a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm3-10H5V5h10v4z"/></svg>',
@@ -636,7 +728,8 @@
                     var input = document.getElementById('sb-name-input');
                     if (input) {
                         input.value = sel.getName() || sel.get('type') || 'My Block';
-                        document.getElementById('sb-name-overlay').classList.add('sb-visible');
+                        var overlay = document.getElementById('sb-name-overlay');
+                        if (overlay) overlay.classList.add('sb-visible');
                         setTimeout(function () { input.focus(); input.select(); }, 50);
                     }
                 }
@@ -644,16 +737,21 @@
             component.set('toolbar', toolbar);
         });
 
-        document.getElementById('sb-name-confirm')?.addEventListener('click', function() {
-            var sel = editor.getSelected(), name = document.getElementById('sb-name-input').value.trim();
+        var sbConfirm = document.getElementById('sb-name-confirm');
+        if (sbConfirm) sbConfirm.addEventListener('click', function() {
+            var sel = editor.getSelected(), nameInput = document.getElementById('sb-name-input');
+            if (!nameInput) return;
+            var name = nameInput.value.trim();
             if (!name || !sel) return;
             var html = sel.toHTML(), css = editor.CodeManager.getCode(sel, 'css') || '', id = 'sb-custom-' + Date.now();
             var list = get(); list.push({ id: id, name: name, html: html + (css ? '<style>' + css + '</style>' : ''), ts: Date.now() });
             set(list); registerOne({ id: id, name: name, html: html + (css ? '<style>' + css + '</style>' : '') });
-            document.getElementById('sb-name-overlay').classList.remove('sb-visible');
+            var overlay = document.getElementById('sb-name-overlay');
+            if (overlay) overlay.classList.remove('sb-visible');
             toastr.success('Saved to My Blocks!');
         });
-        document.getElementById('sb-name-cancel')?.addEventListener('click', function() { document.getElementById('sb-name-overlay').classList.remove('sb-visible'); });
+        var sbCancel = document.getElementById('sb-name-cancel');
+        if (sbCancel) sbCancel.addEventListener('click', function() { var el = document.getElementById('sb-name-overlay'); if (el) el.classList.remove('sb-visible'); });
 
         registerAll();
         editor.on('block:custom', registerAll);
