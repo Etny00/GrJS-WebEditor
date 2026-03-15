@@ -144,7 +144,21 @@
                 'grapesjs-tabs': { tabsBlock: { category: 'Extra' } },
                 'grapesjs-navbar': {},
                 'grapesjs-lory-slider': { sliderBlock: { category: 'Extra' } },
-                'grapesjs-blocks-flexbox': { flexboxBlock: { category: 'Layout' } },
+                'grapesjs-blocks-flexbox': {
+                    flexboxBlock: {
+                        category: 'Layout',
+                        label: 'Flexbox',
+                        attributes: { class: 'fa fa-th-large' }
+                    }
+                },
+                'grapesjs-typed': {
+                    block: {
+                        category: 'Extra',
+                        label: 'Typed Text',
+                        attributes: { class: 'fa fa-i-cursor' },
+                        content: { type: 'typed', 'type-speed': 40, strings: ['Text row one', 'Text row two', 'Text row three'] }
+                    }
+                },
             },
         });
 
@@ -201,13 +215,52 @@
             var openBlocksBtn = pn.getButton('views', 'open-blocks');
             if (openBlocksBtn) openBlocksBtn.set('active', 1);
 
+            // Move Traits to Style Manager as "Settings" sector
+            var $ = grapesjs.$;
+            if ($) {
+                var traitsSector = $('<div class="gjs-sm-sector no-select gjs-open">' +
+                    '<div class="gjs-sm-sector-title"><span class="icon-settings fa fa-cog"></span> <span class="gjs-sm-sector-label">Settings</span></div>' +
+                    '<div class="gjs-sm-properties" style="display: block;"></div></div>');
+                var traitsProps = traitsSector.find('.gjs-sm-properties');
+
+                // We'll move the Traits container once it's available
+                var moveTraits = function() {
+                    var $traits = $('.gjs-traits-cs, .gjs-traits-c, .gjs-trt-traits, .gjs-pn-traits-c');
+                    if ($traits.length && !$.contains(traitsSector[0], $traits[0])) {
+                        traitsProps.append($traits);
+                    }
+                };
+
+                $('.gjs-sm-sectors').before(traitsSector);
+
+                editor.on('load', function() {
+                    setTimeout(moveTraits, 50);
+                });
+
+                editor.on('component:selected', function() {
+                    moveTraits();
+                });
+
+                traitsSector.find('.gjs-sm-sector-title').on('click', function () {
+                    traitsProps.toggle();
+                    traitsSector.toggleClass('gjs-open');
+                });
+            }
+
+            // Remove the default traits view button
+            pn.removeButton('views', 'open-tm');
+
             // Logo & Version
             var logoCont = document.querySelector('.gjs-logo-cont');
             var logoPanel = document.querySelector('.gjs-pn-commands');
-            if (logoCont && logoPanel) {
+            if (logoCont && logoPanel && logoPanel.appendChild) {
                 var ver = logoCont.querySelector('.gjs-logo-version');
                 if (ver) ver.innerHTML = 'v' + grapesjs.version;
-                logoPanel.appendChild(logoCont);
+                try {
+                    // Make sure it's visible and add it to the panel
+                    logoCont.style.display = 'block';
+                    logoPanel.appendChild(logoCont);
+                } catch (e) {}
             }
 
             // Site Settings logic

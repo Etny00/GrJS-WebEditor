@@ -25,128 +25,48 @@ grapesjs.plugins.add('gjs-extra', function(editor, opts) {
   bm.add('counter-block', {
     label: 'Counter', category: 'Extra', attributes: { class: 'fa fa-sort-numeric-asc' },
     content: {
-      type: 'cs-counter', tagName: 'div',
-      attributes: { 'data-gjs-type': 'cs-counter',
-        'data-counter-bg': '#4d114f', 'data-counter-animate': '1', 'data-counter-duration': '2000' },
-      components: '<section style="padding:70px 20px;background:#4d114f;font-family:Helvetica,sans-serif;text-align:center;"><div style="max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;gap:50px;"><div style="min-width:150px;"><div class="cs-counter-num" data-target="10000" style="font-size:3.2em;font-weight:800;color:#fff;line-height:1;margin-bottom:8px;">0</div><div style="font-size:.82em;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.65);">Happy Customers</div></div><div style="min-width:150px;"><div class="cs-counter-num" data-target="350" style="font-size:3.2em;font-weight:800;color:#fff;line-height:1;margin-bottom:8px;">0</div><div style="font-size:.82em;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.65);">Projects Done</div></div><div style="min-width:150px;"><div class="cs-counter-num" data-target="99" style="font-size:3.2em;font-weight:800;color:#fff;line-height:1;margin-bottom:8px;">0</div><div style="font-size:.82em;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.65);">% Satisfaction</div></div><div style="min-width:150px;"><div class="cs-counter-num" data-target="24" style="font-size:3.2em;font-weight:800;color:#fff;line-height:1;margin-bottom:8px;">0</div><div style="font-size:.82em;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.65);">Awards Won</div></div></div></section><script>(function(){function animateCounters(){document.querySelectorAll(\'.cs-counter-num\').forEach(function(el){var target=parseInt(el.getAttribute(\'data-target\')),duration=2000,step=target/duration*16;var current=0;var timer=setInterval(function(){current+=step;if(current>=target){el.textContent=target.toLocaleString();clearInterval(timer);}else{el.textContent=Math.floor(current).toLocaleString();}},16);});}var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){animateCounters();obs.disconnect();}});},{threshold:0.3});var el=document.querySelector(\'.cs-counter-num\');if(el)obs.observe(el.closest(\'section\'));})();<\/script>',
-      traits: [
-        { type: 'color',    name: 'data-counter-bg',       label: 'Background Color' },
-        { type: 'checkbox', name: 'data-counter-animate',  label: 'Animate on Scroll', valueTrue: '1', valueFalse: '0' },
-        { type: 'select',   name: 'data-counter-duration', label: 'Count Speed',
-          options: [{ id: '1000', name: 'Fast (1s)' }, { id: '2000', name: 'Medium (2s)' }, { id: '3500', name: 'Slow (3.5s)' }] },
-      ],
+      type: 'cs-counter',
+      attributes: { 'data-gjs-type': 'cs-counter', 'data-counter-bg': '#4d114f', 'data-counter-animate': '1', 'data-counter-duration': '2000' },
+      components: '<section style="padding:70px 20px;background:#4d114f;font-family:Helvetica,sans-serif;text-align:center;"><div style="max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;gap:50px;"><div style="min-width:150px;"><div class="cs-counter-num" data-target="10000" style="font-size:3.2em;font-weight:800;color:#fff;line-height:1;margin-bottom:8px;">0</div><div style="font-size:.82em;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.65);">Happy Customers</div></div><div style="min-width:150px;"><div class="cs-counter-num" data-target="350" style="font-size:3.2em;font-weight:800;color:#fff;line-height:1;margin-bottom:8px;">0</div><div style="font-size:.82em;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.65);">Projects Done</div></div><div style="min-width:150px;"><div class="cs-counter-num" data-target="99" style="font-size:3.2em;font-weight:800;color:#fff;line-height:1;margin-bottom:8px;">0</div><div style="font-size:.82em;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.65);">% Satisfaction</div></div><div style="min-width:150px;"><div class="cs-counter-num" data-target="24" style="font-size:3.2em;font-weight:800;color:#fff;line-height:1;margin-bottom:8px;">0</div><div style="font-size:.82em;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.65);">Awards Won</div></div></div></section>'
     },
   });
 
   domt.addType('cs-counter', {
-    isComponent: function(el) { return (el.hasAttribute && el.hasAttribute('data-counter-bg')) || (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-counter') ? { type: 'cs-counter' } : undefined; },
+    isComponent: function(el) { return (el.getAttribute && el.getAttribute('data-gjs-type') === 'cs-counter') || (el.hasAttribute && el.hasAttribute('data-counter-bg')) ? { type: 'cs-counter' } : undefined; },
     model: { defaults: { tagName: 'div', traits: [
-      { type: 'color',    name: 'data-counter-bg',       label: 'Background Color', changeProp: 0 },
-      { type: 'checkbox', name: 'data-counter-animate',  label: 'Animate on Scroll', changeProp: 0, valueTrue: '1', valueFalse: '0' },
-      { type: 'select',   name: 'data-counter-duration', label: 'Count Speed', changeProp: 0,
+      { type: 'color',    name: 'data-counter-bg',       label: 'Background Color' },
+      { type: 'checkbox', name: 'data-counter-animate',  label: 'Animate on Scroll', valueTrue: '1', valueFalse: '0' },
+      { type: 'select',   name: 'data-counter-duration', label: 'Count Speed',
         options: [{ id:'1000', name:'Fast (1s)' }, { id:'2000', name:'Medium (2s)' }, { id:'3500', name:'Slow (3.5s)' }] },
     ] } },
   });
 
-  // Trait Handlers
+  // --- Trait Handlers ---
+
   editor.on('component:add', function(model) {
     if (!model || typeof model.getAttributes !== 'function') return;
     var attrs = model.getAttributes();
 
     function child(tag) {
       var found = null;
-      model.components && model.components().each(function(c) {
-        if (!found && c.get('tagName') === tag) found = c;
-      });
+      if (model.components) {
+          model.components().each(function(c) {
+            if (!found && c.get('tagName') === tag) found = c;
+          });
+      }
       return found || model;
     }
 
-    // COUNTER
+    // Counter
     if ('data-counter-bg' in attrs) {
       model.on('change:attributes', function(m) {
         var changed = (m.changed && m.changed.attributes) || {};
         var a = model.getAttributes();
-        var section = child('section');
+        var target = child('section');
         if ('data-counter-bg' in changed) {
-          section.addStyle({ 'background': a['data-counter-bg'] || '#4d114f' });
+          target.addStyle({ 'background': a['data-counter-bg'] || '#4d114f' });
         }
       });
     }
   });
-
-  // Slider / Carousel interactivity in canvas
-  function csInitSliders() {
-    var doc = editor.Canvas.getDocument();
-    if (!doc) return;
-
-    var configs = [
-      { wrap: '.cs-sl', track: '.cs-sl-track', prev: '.cs-sl-prev', next: '.cs-sl-next', dot: '.cs-sl-dot', dotOn: 'cs-sl-dot-active' },
-      { wrap: '.cs-cn', track: '.cs-cn-track', prev: '.cs-cn-prev', next: '.cs-cn-next', dot: null },
-      { wrap: '.cs-cmed', track: '.cs-cmed-track', prev: '.cs-cmed-prev', next: '.cs-cmed-next', dot: null },
-      { wrap: '.cs-cimg', track: '.cs-cimg-track', prev: '.cs-cimg-prev', next: '.cs-cimg-next', dot: '.cs-cimg-dot', dotOn: 'cs-cimg-dot-on' }
-    ];
-
-    configs.forEach(function (cfg) {
-      var els = doc.querySelectorAll(cfg.wrap);
-      for (var i = 0; i < els.length; i++) {
-        var el = els[i];
-        if (el._csInited) continue;
-        el._csInited = true;
-        el.setAttribute('data-cur', '0');
-        var track = el.querySelector(cfg.track);
-        var slides = track ? track.children : [];
-        var n = slides.length;
-        if (!track || n === 0) continue;
-
-        (function(el, track, slides, n, cfg) {
-            function goTo(i) {
-                i = ((i % n) + n) % n;
-                el.setAttribute('data-cur', i);
-                track.style.transform = 'translateX(-' + (i * 100) + '%)';
-                if (cfg.dot) {
-                    var dots = el.querySelectorAll(cfg.dot);
-                    for (var j = 0; j < dots.length; j++) {
-                        dots[j].classList.toggle(cfg.dotOn, j === i);
-                    }
-                }
-            }
-
-            var prev = el.querySelector(cfg.prev);
-            var next = el.querySelector(cfg.next);
-            if (prev) prev.addEventListener('click', function (e) {
-                e.stopPropagation();
-                goTo(parseInt(el.getAttribute('data-cur') || 0) - 1);
-            });
-            if (next) next.addEventListener('click', function (e) {
-                e.stopPropagation();
-                goTo(parseInt(el.getAttribute('data-cur') || 0) + 1);
-            });
-            if (cfg.dot) {
-                var dots = el.querySelectorAll(cfg.dot);
-                for (var idx = 0; idx < dots.length; idx++) {
-                    (function(idx) {
-                        dots[idx].addEventListener('click', function (e) {
-                            e.stopPropagation();
-                            goTo(idx);
-                        });
-                    })(idx);
-                }
-            }
-        })(el, track, slides, n, cfg);
-      }
-    });
-  }
-
-  editor.on('load', function() {
-    csInitSliders();
-    var frame = editor.Canvas.getFrameEl();
-    if (frame) {
-      frame.addEventListener('load', function() {
-        setTimeout(csInitSliders, 200);
-      });
-    }
-  });
-
-  editor.on('component:add', function () { setTimeout(csInitSliders, 100); });
-  editor.on('component:update', function () { setTimeout(csInitSliders, 100); });
 });
