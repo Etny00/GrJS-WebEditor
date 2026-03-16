@@ -111,6 +111,92 @@
                         ],
                     },
                     {
+                        name: 'Flex',
+                        open: false,
+                        properties: [
+                            {
+                                name: ' ',
+                                property: 'flex-info',
+                                type: 'label',
+                                label: '<div id="flex-warning-note" style="padding: 10px; background-color: #45465A; color: #8B9FE0; border-radius: 3px; font-size: 11px; text-align: center; margin-bottom: 10px;">Set "Display" to "Flex" first</div>',
+                            },
+                            {
+                                property: 'flex-direction',
+                                type: 'radio',
+                                default: 'row',
+                                options: [
+                                    { value: 'row', title: 'Row', className: 'icons-flex icon-dir-row' },
+                                    { value: 'row-reverse', title: 'Row Reverse', className: 'icons-flex icon-dir-row-rev' },
+                                    { value: 'column', title: 'Column', className: 'icons-flex icon-dir-col' },
+                                    { value: 'column-reverse', title: 'Column Reverse', className: 'icons-flex icon-dir-col-rev' },
+                                ],
+                            },
+                            {
+                                property: 'flex-wrap',
+                                type: 'radio',
+                                default: 'nowrap',
+                                options: [
+                                    { value: 'nowrap', title: 'No Wrap', className: 'fa fa-minus' },
+                                    { value: 'wrap', title: 'Wrap', className: 'fa fa-level-down' },
+                                    { value: 'wrap-reverse', title: 'Wrap Reverse', className: 'fa fa-level-up' },
+                                ],
+                            },
+                            {
+                                property: 'justify-content',
+                                type: 'radio',
+                                default: 'flex-start',
+                                options: [
+                                    { value: 'flex-start', className: 'icons-flex icon-just-start' },
+                                    { value: 'flex-end', className: 'icons-flex icon-just-end' },
+                                    { value: 'space-between', className: 'icons-flex icon-just-sp-bet' },
+                                    { value: 'space-around', className: 'icons-flex icon-just-sp-ar' },
+                                    { value: 'center', className: 'icons-flex icon-just-sp-cent' },
+                                ],
+                            },
+                            {
+                                property: 'align-items',
+                                type: 'radio',
+                                default: 'stretch',
+                                options: [
+                                    { value: 'flex-start', className: 'icons-flex icon-al-start' },
+                                    { value: 'flex-end', className: 'icons-flex icon-al-end' },
+                                    { value: 'stretch', className: 'icons-flex icon-al-str' },
+                                    { value: 'center', className: 'icons-flex icon-al-center' },
+                                ],
+                            },
+                            {
+                                property: 'align-content',
+                                type: 'radio',
+                                default: 'stretch',
+                                options: [
+                                    { value: 'flex-start', title: 'Start', className: 'fa fa-arrow-up' },
+                                    { value: 'flex-end', title: 'End', className: 'fa fa-arrow-down' },
+                                    { value: 'center', title: 'Center', className: 'fa fa-arrows-v' },
+                                    { value: 'space-between', title: 'Space Between', className: 'fa fa-ellipsis-v' },
+                                    { value: 'space-around', title: 'Space Around', className: 'fa fa-ellipsis-h' },
+                                    { value: 'stretch', title: 'Stretch', className: 'fa fa-align-justify' },
+                                ],
+                            },
+                            { property: 'gap', type: 'integer', default: '0', units: ['px', '%', 'em', 'rem', 'vh', 'vw'] },
+                            { property: 'flex-grow', type: 'integer', default: '0' },
+                            { property: 'flex-shrink', type: 'integer', default: '1' },
+                            { property: 'flex-basis', type: 'integer', default: 'auto', units: ['px', '%', 'em', 'rem', 'vh', 'vw'] },
+                            {
+                                property: 'align-self',
+                                type: 'radio',
+                                default: 'auto',
+                                options: [
+                                    { value: 'auto', name: 'Auto' },
+                                    { value: 'flex-start', className: 'icons-flex icon-al-start' },
+                                    { value: 'flex-end', className: 'icons-flex icon-al-end' },
+                                    { value: 'stretch', className: 'icons-flex icon-al-str' },
+                                    { value: 'center', className: 'icons-flex icon-al-center' },
+                                ],
+                            },
+                            { property: 'order', type: 'integer', default: '0' },
+                        ],
+                    },
+                    {
                         name: 'Dimension', open: false,
                         properties: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding'],
                     },
@@ -211,6 +297,22 @@
         editor.on('load', function () {
             var openSm = pn.getButton('views', 'open-sm');
             if (openSm) openSm.set('active', 1);
+
+            // Handle Flex sector note visibility
+            var updateFlexNote = function() {
+                var selected = editor.getSelected();
+                var flexNote = document.getElementById('flex-warning-note');
+                if (selected && flexNote) {
+                    var display = selected.getStyle().display || selected.getAttributes().display || '';
+                    // Check computed style if not explicitly set in model
+                    if (!display && selected.getEl()) {
+                        display = window.getComputedStyle(selected.getEl()).display;
+                    }
+                    flexNote.style.display = (display === 'flex' || display === 'inline-flex') ? 'none' : 'block';
+                }
+            };
+
+            editor.on('component:selected component:update:style component:style:update', updateFlexNote);
 
             var openBlocksBtn = pn.getButton('views', 'open-blocks');
             if (openBlocksBtn) openBlocksBtn.set('active', 1);
