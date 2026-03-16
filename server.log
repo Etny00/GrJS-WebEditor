@@ -1,18 +1,103 @@
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/http/server.py", line 1329, in <module>
-    test(
-  File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/http/server.py", line 1276, in test
-    with ServerClass(addr, HandlerClass) as httpd:
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/socketserver.py", line 457, in __init__
-    self.server_bind()
-  File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/http/server.py", line 1323, in server_bind
-    return super().server_bind()
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/http/server.py", line 140, in server_bind
-    socketserver.TCPServer.server_bind(self)
-  File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/socketserver.py", line 478, in server_bind
-    self.socket.bind(self.server_address)
-OSError: [Errno 98] Address already in use
+127.0.0.1 - - [16/Mar/2026 11:52:01] "GET /editor.html HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:02] "GET /stylesheets/tooltip.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:02] "GET /stylesheets/demos.css?v3 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:02] "GET /stylesheets/grapesjs-preset-webpage.min.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:02] "GET /js/toastr.min.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:02] "GET /stylesheets/toastr.min.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:02] "GET /stylesheets/grapes.min.css?v0.21.10 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:02] "GET /js/grapes.min.js?v0.21.10 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:02] "GET /js/editor-core.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:02] "GET /img/grapesjs-logo-cl.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:02] "GET /js/editor-config.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:03] "GET /js/plugins/gjs-custom-basic.js?t=1773661923019 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:03] "GET /js/plugins/gjs-layout.js?t=1773661923034 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:03] "GET /js/plugins/gjs-sections.js?t=1773661923041 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:03] "GET /js/plugins/gjs-media.js?t=1773661923053 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:03] "GET /js/plugins/gjs-extra.js?t=1773661923060 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:51] "GET /editor.html HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:51] "GET /stylesheets/grapes.min.css?v0.21.10 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:51] "GET /stylesheets/toastr.min.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:51] "GET /stylesheets/grapesjs-preset-webpage.min.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:51] "GET /stylesheets/tooltip.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:51] "GET /stylesheets/demos.css?v3 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:51] "GET /img/grapesjs-logo-cl.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:51] "GET /js/grapes.min.js?v0.21.10 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:51] "GET /js/toastr.min.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:51] "GET /js/editor-core.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:52] "GET /js/editor-config.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:52] "GET /js/plugins/gjs-custom-basic.js?t=1773661972245 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:52] "GET /js/plugins/gjs-layout.js?t=1773661972254 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:52] "GET /js/plugins/gjs-sections.js?t=1773661972260 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:52] "GET /js/plugins/gjs-media.js?t=1773661972266 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:52] "GET /js/plugins/gjs-extra.js?t=1773661972272 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:59] "GET /img/flex-dir-col-rev.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:59] "GET /img/flex-just-start.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:59] "GET /img/flex-dir-row-rev.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:59] "GET /img/flex-dir-col.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:59] "GET /img/flex-just-end.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:59] "GET /img/flex-dir-row.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:59] "GET /img/flex-just-sp-cent.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:59] "GET /img/flex-al-end.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:59] "GET /img/flex-just-sp-bet.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:59] "GET /img/flex-just-sp-ar.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:59] "GET /img/flex-al-center.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:59] "GET /img/flex-al-start.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:52:59] "GET /img/flex-al-str.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /editor.html HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /stylesheets/toastr.min.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /stylesheets/tooltip.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /stylesheets/demos.css?v3 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /stylesheets/grapes.min.css?v0.21.10 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /stylesheets/grapesjs-preset-webpage.min.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /js/toastr.min.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /img/grapesjs-logo-cl.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /js/grapes.min.js?v0.21.10 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /js/editor-core.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /js/editor-config.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /js/plugins/gjs-custom-basic.js?t=1773662033897 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /js/plugins/gjs-layout.js?t=1773662033906 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /js/plugins/gjs-sections.js?t=1773662033912 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /js/plugins/gjs-media.js?t=1773662033917 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:53:53] "GET /js/plugins/gjs-extra.js?t=1773662033922 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:00] "GET /img/flex-dir-row.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:00] "GET /img/flex-just-start.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:00] "GET /img/flex-just-end.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:00] "GET /img/flex-dir-row-rev.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:00] "GET /img/flex-dir-col.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:00] "GET /img/flex-dir-col-rev.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:00] "GET /img/flex-just-sp-bet.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:00] "GET /img/flex-al-start.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:00] "GET /img/flex-just-sp-ar.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:00] "GET /img/flex-al-end.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:00] "GET /img/flex-just-sp-cent.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:00] "GET /img/flex-al-str.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:00] "GET /img/flex-al-center.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:44] "GET /editor.html HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:44] "GET /stylesheets/toastr.min.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:44] "GET /stylesheets/grapesjs-preset-webpage.min.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:44] "GET /stylesheets/demos.css?v3 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:44] "GET /js/grapes.min.js?v0.21.10 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:44] "GET /stylesheets/grapes.min.css?v0.21.10 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:44] "GET /js/toastr.min.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:44] "GET /stylesheets/tooltip.css HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:44] "GET /img/grapesjs-logo-cl.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:44] "GET /js/editor-core.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:44] "GET /js/editor-config.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:45] "GET /js/plugins/gjs-custom-basic.js?t=1773662085077 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:45] "GET /js/plugins/gjs-layout.js?t=1773662085085 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:45] "GET /js/plugins/gjs-sections.js?t=1773662085089 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:45] "GET /js/plugins/gjs-media.js?t=1773662085093 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:45] "GET /js/plugins/gjs-extra.js?t=1773662085097 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:51] "GET /img/flex-dir-row.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:51] "GET /img/flex-just-end.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:51] "GET /img/flex-dir-row-rev.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:51] "GET /img/flex-just-start.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:51] "GET /img/flex-dir-col-rev.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:51] "GET /img/flex-dir-col.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:51] "GET /img/flex-just-sp-bet.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:51] "GET /img/flex-al-str.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:51] "GET /img/flex-just-sp-cent.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:51] "GET /img/flex-just-sp-ar.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:51] "GET /img/flex-al-end.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:51] "GET /img/flex-al-start.png HTTP/1.1" 200 -
+127.0.0.1 - - [16/Mar/2026 11:54:51] "GET /img/flex-al-center.png HTTP/1.1" 200 -
